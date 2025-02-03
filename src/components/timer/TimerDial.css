@@ -1,0 +1,148 @@
+.timer-dial-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.timer-dial {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+.timer-dial.clicking {
+  transform: scale(0.98);
+}
+
+.timer-dial.dragging {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dial-markers {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: rotate(0deg);
+  transition: transform 0.3s cubic-bezier(0.4, 2, 0.4, 1);
+}
+
+.dial-marker {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  height: 8px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform-origin: 50% calc(100px - 4px);
+  transition: background-color 0.2s ease;
+}
+
+.dial-marker.hour {
+  height: 12px;
+  width: 2px;
+  top: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.timer-dial:hover .dial-marker {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.timer-dial:hover .dial-marker.hour {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dial-hand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 85px;
+  width: 2px;
+  background: var(--accent-color);
+  transform-origin: 50% 0;
+  margin-left: -1px;
+  transition: transform 0.15s cubic-bezier(0.4, 2, 0.4, 1);
+  will-change: transform;
+}
+
+.dial-hand-dot {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.dial-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.timer-dial.clicking .dial-center {
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+.dial-value {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  transform: translateX(-50%);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.timer-dial.clicking .dial-value {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* Add hover effect to the dial */
+.timer-dial:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Add active state for when dragging */
+.timer-dial:active {
+  background: rgba(255, 255, 255, 0.07);
+  transform: scale(0.98);
+}
+
+/* Add subtle pulsing animation to the center dot when dragging */
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.timer-dial.dragging .dial-center {
+  animation: pulse 1s ease-in-out infinite;
+} 

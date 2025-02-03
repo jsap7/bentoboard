@@ -1,0 +1,282 @@
+.timer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #161616;
+}
+
+.settings-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+  z-index: 100;
+}
+
+.settings-button:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(30deg);
+}
+
+.settings-button svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.timer-ring-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.timer-ring-progress {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.timer-display-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.timer-display {
+  font-size: 84px;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  transition: color 0.3s ease;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.timer-display.timer-complete {
+  color: var(--accent-color);
+  animation: pulse 1.5s infinite;
+}
+
+.timer-label {
+  font-size: 0.875rem;
+  color: var(--accent-color);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  opacity: 0.6;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.timer-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  font-size: 84px;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.timer-input input {
+  width: 100px;
+  padding: 0;
+  font-size: 84px;
+  font-weight: 200;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  transition: all 0.2s ease;
+  caret-color: var(--accent-color);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.timer-input input:first-child {
+  text-align: right;
+  margin-right: -3px;
+}
+
+.timer-input input:last-child {
+  text-align: left;
+  margin-left: -3px;
+}
+
+.timer-input input:focus {
+  outline: none;
+}
+
+/* Remove spinner buttons from number inputs */
+.timer-input input::-webkit-outer-spin-button,
+.timer-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.timer-input input[type=number] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.timer-input span {
+  font-size: 84px;
+  font-weight: 200;
+  color: rgba(255, 255, 255, 0.4);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  user-select: none;
+  padding: 0 2px;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.timer-button {
+  padding: 12px 24px;
+  font-size: 20px;
+  font-weight: 500;
+  color: #fff;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.timer-button:hover {
+  opacity: 0.9;
+}
+
+.timer-button.reset {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.timer-button.reset:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.timer-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 320px;
+}
+
+.timer-preset-button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  cursor: pointer;
+  font-family: 'SF Pro Display', sans-serif;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  min-width: 45px;
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-preset-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--accent-color);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.timer-preset-button:hover::before {
+  opacity: 0.1;
+}
+
+.timer-shortcuts {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.timer-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background-color: var(--accent-color);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 500;
+  animation: slideUp 0.3s ease;
+  z-index: 100;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
