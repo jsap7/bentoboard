@@ -3,7 +3,7 @@ import TimerRing from './TimerRing';
 import TimerDial from './TimerDial';
 import TimerScroll from './TimerScroll';
 import Settings from '../settings/Settings';
-import { useSettings, InputMethods } from '../../context/SettingsContext.jsx';
+import { useSettings, InputMethods, TimerModes } from '../../context/SettingsContext.jsx';
 import { playNotificationSound } from '/public/notification.js';
 import './Timer.css';
 
@@ -16,6 +16,8 @@ const Timer = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [totalTime, setTotalTime] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [milliseconds, setMilliseconds] = useState(0);
   
   const { settings } = useSettings();
 
@@ -26,23 +28,35 @@ const Timer = () => {
 
   useEffect(() => {
     let interval;
-    if (isRunning && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((time) => {
-          if (time <= 1) {
-            setIsRunning(false);
-            setIsComplete(true);
-            playNotificationSound();
-            setShowNotification(true);
-            setTimeout(() => setShowNotification(false), 5000);
-            return 0;
-          }
-          return time - 1;
-        });
-      }, 1000);
+    let startTime;
+    
+    if (isRunning) {
+      if (settings.timerMode === TimerModes.STOPWATCH) {
+        startTime = Date.now() - (elapsedTime * 1000 + milliseconds);
+        interval = setInterval(() => {
+          const now = Date.now();
+          const diff = now - startTime;
+          setElapsedTime(Math.floor(diff / 1000));
+          setMilliseconds(diff % 1000);
+        }, 16);
+      } else if (timeLeft > 0) {
+        interval = setInterval(() => {
+          setTimeLeft((time) => {
+            if (time <= 1) {
+              setIsRunning(false);
+              setIsComplete(true);
+              playNotificationSound();
+              setShowNotification(true);
+              setTimeout(() => setShowNotification(false), 5000);
+              return 0;
+            }
+            return time - 1;
+          });
+        }, 1000);
+      }
     }
     return () => clearInterval(interval);
-  }, [isRunning]);
+  }, [isRunning, settings.timerMode]);
 
   // Handlers
   const handleTimeSelected = useCallback((totalSeconds) => {
@@ -53,7 +67,9 @@ const Timer = () => {
   }, [isRunning]);
 
   const handleStart = useCallback(() => {
-    if (!isRunning) {
+    if (settings.timerMode === TimerModes.STOPWATCH) {
+      setIsRunning(true);
+    } else if (!isRunning) {
       if (timeLeft > 0) {
         setIsRunning(true);
       } else if (selectedTime > 0) {
@@ -63,7 +79,7 @@ const Timer = () => {
         setIsComplete(false);
       }
     }
-  }, [selectedTime, isRunning, timeLeft]);
+  }, [selectedTime, isRunning, timeLeft, settings.timerMode]);
 
   const handlePause = useCallback(() => {
     setIsRunning(false);
@@ -71,26 +87,69 @@ const Timer = () => {
 
   const handleReset = useCallback(() => {
     setIsRunning(false);
-    setTimeLeft(0);
-    setTotalTime(0);
-    setSelectedTime(0);
-    setIsComplete(false);
-  }, []);
+    if (settings.timerMode === TimerModes.STOPWATCH) {
+      setElapsedTime(0);
+      setMilliseconds(0);
+    } else {
+      setTimeLeft(0);
+      setTotalTime(0);
+      setSelectedTime(0);
+      setIsComplete(false);
+    }
+  }, [settings.timerMode]);
 
   // Utilities
-  const formatTime = (time) => {
+  const calculateProgress = () => {
+    if (settings.timerMode === TimerModes.STOPWATCH) {
+      // Calculate progress for one lap per minute
+      const totalSeconds = elapsedTime + (milliseconds / 1000);
+      return (totalSeconds % 60) / 60;
+    }
+    // Normal timer progress
+    return timeLeft > 0 ? timeLeft / totalTime : 0;
+  };
+
+  const formatTime = (time, includeMilliseconds = false) => {
     const hours = Math.floor(time / 3600);
     const mins = Math.floor((time % 3600) / 60);
     const secs = time % 60;
     
-    if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const mainTime = hours > 0
+      ? `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+      : `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+    if (includeMilliseconds) {
+      const ms = Math.floor(milliseconds / 10).toString().padStart(2, '0');
+      return (
+        <>
+          <span className="main-time">{mainTime}</span>
+          <span className="milliseconds">{ms}</span>
+        </>
+      );
     }
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+    return <span className="main-time">{mainTime}</span>;
   };
 
   // Render methods
   const renderTimerInput = () => {
+    // Only show input methods in Timer mode
+    if (settings.timerMode === TimerModes.STOPWATCH) {
+      return (
+        <div className="timer-display">
+          {formatTime(elapsedTime, true)}
+        </div>
+      );
+    }
+
+    if (settings.timerMode !== TimerModes.TIMER) {
+      return (
+        <div className="timer-display">
+          {formatTime(timeLeft)}
+        </div>
+      );
+    }
+
     if (isRunning || timeLeft > 0) {
       return (
         <div className={`timer-display ${isComplete ? 'timer-complete' : ''}`}>
@@ -146,6 +205,66 @@ const Timer = () => {
     );
   };
 
+  // Customize controls based on mode
+  const renderControls = () => {
+    switch (settings.timerMode) {
+      case TimerModes.TIMER:
+        return (
+          <>
+            {!isRunning ? (
+              <button 
+                className="timer-button" 
+                onClick={handleStart}
+                style={{ backgroundColor: settings.theme.buttonColor }}
+              >
+                {timeLeft > 0 ? 'Resume' : 'Start'}
+              </button>
+            ) : (
+              <button 
+                className="timer-button" 
+                onClick={handlePause}
+                style={{ backgroundColor: settings.theme.buttonColor }}
+              >
+                Pause
+              </button>
+            )}
+            <button className="timer-button reset" onClick={handleReset}>
+              Reset
+            </button>
+          </>
+        );
+      
+      case TimerModes.STOPWATCH:
+        return (
+          <>
+            <button 
+              className="timer-button" 
+              onClick={isRunning ? handlePause : handleStart}
+              style={{ backgroundColor: settings.theme.buttonColor }}
+            >
+              {isRunning ? 'Stop' : 'Start'}
+            </button>
+            <button className="timer-button reset" onClick={handleReset}>
+              Reset
+            </button>
+          </>
+        );
+      
+      case TimerModes.ALARM:
+        return (
+          <>
+            <button 
+              className="timer-button" 
+              onClick={isRunning ? handlePause : handleStart}
+              style={{ backgroundColor: settings.theme.buttonColor }}
+            >
+              {isRunning ? 'Disable' : 'Enable'}
+            </button>
+          </>
+        );
+    }
+  };
+
   return (
     <div className="timer">
       <button 
@@ -160,33 +279,15 @@ const Timer = () => {
       </button>
 
       <div className="timer-ring-container">
-        <TimerRing progress={timeLeft > 0 ? timeLeft / totalTime : 0} />
+        <div className="mode-title">{settings.timerMode}</div>
+        <TimerRing progress={calculateProgress()} />
         <div className="timer-display-container">
           {renderTimerInput()}
         </div>
       </div>
       
       <div className="timer-controls">
-        {!isRunning ? (
-          <button 
-            className="timer-button" 
-            onClick={handleStart}
-            style={{ backgroundColor: settings.theme.buttonColor }}
-          >
-            {timeLeft > 0 ? 'Resume' : 'Start'}
-          </button>
-        ) : (
-          <button 
-            className="timer-button" 
-            onClick={handlePause}
-            style={{ backgroundColor: settings.theme.buttonColor }}
-          >
-            Pause
-          </button>
-        )}
-        <button className="timer-button reset" onClick={handleReset}>
-          Reset
-        </button>
+        {renderControls()}
       </div>
 
       {showNotification && (

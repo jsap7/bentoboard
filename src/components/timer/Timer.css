@@ -58,7 +58,40 @@
 .timer-ring-progress {
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
-  transition: stroke-dashoffset 0.3s ease;
+  transition: stroke-dashoffset 16ms linear;
+  will-change: stroke-dashoffset, transform;
+}
+
+/* Smoother animation for stopwatch mode */
+.timer-ring-progress.stopwatch {
+  transition: stroke-dashoffset 16ms linear;
+  will-change: stroke-dashoffset, transform;
+}
+
+.timer-ring-progress.loop-complete {
+  animation: spinAround 1.5s cubic-bezier(0.2, 0, 0.3, 1);
+}
+
+@keyframes spinAround {
+  0% {
+    transform: rotate(-90deg);
+    stroke-opacity: 1;
+  }
+  20% {
+    transform: rotate(90deg);
+    stroke-opacity: 0.8;
+    stroke-width: 6px;
+  }
+  60% {
+    transform: rotate(450deg);
+    stroke-opacity: 0.9;
+    stroke-width: 5px;
+  }
+  100% {
+    transform: rotate(630deg);
+    stroke-opacity: 1;
+    stroke-width: 4px;
+  }
 }
 
 .timer-display-container {
@@ -81,6 +114,28 @@
   transition: color 0.3s ease;
   letter-spacing: -1px;
   line-height: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.timer-display .main-time {
+  min-width: 4.5ch;
+  text-align: right;
+  display: inline-block;
+}
+
+.timer-display .milliseconds {
+  font-size: 22px;
+  opacity: 0.5;
+  font-weight: 300;
+  min-width: 2ch;
+  text-align: left;
+  display: inline-block;
+  margin-left: 1px;
+  position: relative;
+  top: 0;
+  letter-spacing: 0px;
 }
 
 .timer-display.timer-complete {
@@ -170,13 +225,14 @@
 .timer-button {
   padding: 12px 24px;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
   color: #fff;
   background-color: var(--accent-color);
   border: none;
   border-radius: 30px;
   cursor: pointer;
   transition: opacity 0.2s ease;
+  font-family: 'SF Pro Display', sans-serif;
 }
 
 .timer-button:hover {
@@ -279,4 +335,26 @@
     opacity: 1;
   }
 }
+
+.mode-title {
+  position: absolute;
+  top: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 44px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: -0.5px;
+  text-transform: capitalize;
+  font-family: 'SF Pro Display', sans-serif;
+}
+
+/* Remove old mode selector styles */
+.mode-selector,
+.mode-button,
+.mode-button:hover,
+.mode-button.active {
+  display: none;
+}
+
 

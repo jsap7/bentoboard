@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSettings, InputMethods } from '../../context/SettingsContext.jsx';
+import { useSettings, InputMethods, TimerModes } from '../../context/SettingsContext.jsx';
 import './Settings.css';
 
 const Settings = ({ onClose }) => {
@@ -32,6 +32,13 @@ const Settings = ({ onClose }) => {
         ...settings.theme,
         buttonColor: color
       }
+    });
+  };
+
+  const handleModeChange = (e) => {
+    updateSettings({
+      ...settings,
+      timerMode: e.target.value
     });
   };
 
@@ -92,6 +99,20 @@ const Settings = ({ onClose }) => {
               <path d="M18 6L6 18M6 6l12 12"/>
             </svg>
           </button>
+        </div>
+
+        <div className="settings-section">
+          <h3 className="settings-section-title">Timer Mode</h3>
+          <div className="settings-option">
+            <select 
+              value={settings.timerMode} 
+              onChange={handleModeChange}
+            >
+              <option value={TimerModes.TIMER}>Timer</option>
+              <option value={TimerModes.STOPWATCH}>Stopwatch</option>
+              <option value={TimerModes.ALARM}>Alarm</option>
+            </select>
+          </div>
         </div>
 
         <div className="settings-section">

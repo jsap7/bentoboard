@@ -9,6 +9,12 @@ export const InputMethods = {
   SCROLL: 'scroll',
 };
 
+export const TimerModes = {
+  TIMER: 'timer',
+  STOPWATCH: 'stopwatch',
+  ALARM: 'alarm',
+};
+
 export const defaultTheme = {
   ringColor: '#007AFF',
   buttonColor: '#007AFF',
@@ -46,6 +52,7 @@ const defaultSettings = {
   inputMethod: InputMethods.SCROLL,
   theme: defaultTheme,
   showSeconds: true,
+  timerMode: TimerModes.TIMER,
 };
 
 const loadSavedSettings = () => {
