@@ -114,33 +114,117 @@
   transition: color 0.3s ease;
   letter-spacing: -1px;
   line-height: 1;
+}
+
+/* Timer mode specific styles */
+.timer-mode .timer-display {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: center;
+  min-width: 200px;
+}
+
+.timer-mode .timer-display .main-time {
+  min-width: 4.5ch;
+  text-align: center;
+}
+
+.timer-mode .timer-display.timer-complete {
+  color: var(--accent-color);
+  animation: pulse 1.5s infinite;
+}
+
+/* Alarm mode specific styles */
+.alarm-mode .timer-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
-.timer-display .main-time {
-  min-width: 4.5ch;
-  text-align: right;
-  display: inline-block;
+.alarm-mode .time-with-meridiem {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
 }
 
-.timer-display .milliseconds {
-  font-size: 22px;
-  opacity: 0.5;
+.alarm-mode .time-with-meridiem .meridiem {
+  font-size: 24px;
   font-weight: 300;
-  min-width: 2ch;
-  text-align: left;
-  display: inline-block;
-  margin-left: 1px;
-  position: relative;
-  top: 0;
-  letter-spacing: 0px;
+  opacity: 0.7;
+  margin-left: 4px;
 }
 
-.timer-display.timer-complete {
-  color: var(--accent-color);
-  animation: pulse 1.5s infinite;
+/* Alarm scroll container specific styles */
+.alarm-scroll-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}
+
+.alarm-scroll-container .scroll-wheel {
+  width: 70px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  position: relative;
+}
+
+.alarm-scroll-container .ampm-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.alarm-scroll-container .ampm-button {
+  padding: 10px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 52px;
+}
+
+.alarm-scroll-container .ampm-button.active {
+  color: #fff;
+  background: var(--accent-color);
+}
+
+.alarm-scroll-container .scroll-number {
+  font-size: 24px;
+  height: 46px;
+}
+
+.alarm-scroll-container .scroll-number.selected {
+  font-size: 32px;
+  color: #fff;
+}
+
+.alarm-scroll-container .scroll-number.adjacent {
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.alarm-scroll-container .scroll-label {
+  position: absolute;
+  bottom: -24px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .timer-label {
@@ -355,6 +439,188 @@
 .mode-button:hover,
 .mode-button.active {
   display: none;
+}
+
+.alarm-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.alarm-display .current-time {
+  font-size: 84px;
+  font-weight: 200;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: -1px;
+}
+
+.alarm-display .alarm-time {
+  font-size: 32px;
+  color: var(--accent-color);
+  opacity: 0.9;
+  font-weight: 300;
+  margin-top: -8px;
+}
+
+/* Update timer input for alarm mode */
+.timer-input input.alarm-input {
+  width: 60px;
+  text-align: center;
+}
+
+/* Notification style update for alarm */
+.timer-notification.alarm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+}
+
+.timer-notification.alarm::before {
+  content: '⏰';
+  font-size: 24px;
+}
+
+.time-with-meridiem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 84px;
+  font-weight: 200;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.time-with-meridiem .meridiem {
+  font-size: 32px;
+  font-weight: 300;
+  opacity: 0.7;
+}
+
+.alarm-scroll-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+  padding: 0 20px;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.ampm-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.ampm-button {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'SF Pro Display', sans-serif;
+  letter-spacing: 0.5px;
+  min-width: 44px;
+}
+
+.ampm-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ampm-button.active {
+  color: #fff;
+  background: var(--accent-color);
+}
+
+/* Update scroll wheel styles */
+.scroll-wheel {
+  position: relative;
+  width: 60px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+}
+
+.scroll-number {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  will-change: transform;
+}
+
+.scroll-number.selected {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.scroll-number.adjacent {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 22px;
+}
+
+.scroll-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -24px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Stopwatch specific styles */
+.stopwatch-mode .timer-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.stopwatch-mode .timer-display .main-time {
+  min-width: 4.5ch;
+  text-align: right;
+}
+
+.stopwatch-mode .timer-display .milliseconds {
+  font-size: 22px;
+  opacity: 0.5;
+  font-weight: 300;
+  min-width: 2ch;
+  text-align: left;
+  margin-left: 1px;
+  letter-spacing: 0px;
 }
 
 

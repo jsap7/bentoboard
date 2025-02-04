@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './TimerScroll.css';
 
-const ScrollWheel = ({ value, onChange, max, label }) => {
+const ScrollWheel = ({ value, onChange, max, min = 0, label }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startValue, setStartValue] = useState(0);
@@ -32,7 +32,7 @@ const ScrollWheel = ({ value, onChange, max, label }) => {
     let newValue = startValue + valueDelta;
 
     // Ensure the value stays within bounds
-    newValue = Math.max(0, Math.min(newValue, max - 1));
+    newValue = Math.max(min, Math.min(newValue, max));
     
     if (newValue !== currentValue) {
       setCurrentValue(newValue);
@@ -72,7 +72,7 @@ const ScrollWheel = ({ value, onChange, max, label }) => {
   // Generate array of visible numbers (current ± 2)
   const getVisibleNumbers = () => {
     const numbers = [];
-    for (let i = Math.max(0, currentValue - 2); i <= Math.min(max - 1, currentValue + 2); i++) {
+    for (let i = Math.max(min, currentValue - 2); i <= Math.min(max, currentValue + 2); i++) {
       numbers.push(i);
     }
     return numbers;
@@ -111,7 +111,19 @@ const ScrollWheel = ({ value, onChange, max, label }) => {
   );
 };
 
-const TimerScroll = ({ onTimeSet }) => {
+const TimerScroll = ({ value, onChange, max, min, label }) => {
+  if (value !== undefined && onChange !== undefined) {
+    return (
+      <ScrollWheel
+        value={value}
+        onChange={onChange}
+        max={max}
+        min={min}
+        label={label}
+      />
+    );
+  }
+
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
 

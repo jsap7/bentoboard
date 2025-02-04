@@ -18,6 +18,8 @@ const Timer = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [milliseconds, setMilliseconds] = useState(0);
+  const [alarmTime, setAlarmTime] = useState(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
   
   const { settings } = useSettings();
 
@@ -58,6 +60,31 @@ const Timer = () => {
     return () => clearInterval(interval);
   }, [isRunning, settings.timerMode]);
 
+  useEffect(() => {
+    let interval;
+    if (settings.timerMode === TimerModes.ALARM) {
+      interval = setInterval(() => {
+        const now = new Date();
+        setCurrentTime(now);
+        
+        // Check if alarm should trigger
+        if (alarmTime && isRunning) {
+          const alarmHours = Math.floor(alarmTime / 3600);
+          const alarmMinutes = Math.floor((alarmTime % 3600) / 60);
+          
+          if (now.getHours() === alarmHours && now.getMinutes() === alarmMinutes && now.getSeconds() === 0) {
+            setIsComplete(true);
+            setIsRunning(false);
+            playNotificationSound();
+            setShowNotification(true);
+            setTimeout(() => setShowNotification(false), 5000);
+          }
+        }
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [settings.timerMode, alarmTime, isRunning]);
+
   // Handlers
   const handleTimeSelected = useCallback((totalSeconds) => {
     if (!isRunning) {
@@ -67,7 +94,12 @@ const Timer = () => {
   }, [isRunning]);
 
   const handleStart = useCallback(() => {
-    if (settings.timerMode === TimerModes.STOPWATCH) {
+    if (settings.timerMode === TimerModes.ALARM) {
+      if (alarmTime !== null) {
+        setIsRunning(true);
+        setIsComplete(false);
+      }
+    } else if (settings.timerMode === TimerModes.STOPWATCH) {
       setIsRunning(true);
     } else if (!isRunning) {
       if (timeLeft > 0) {
@@ -79,7 +111,7 @@ const Timer = () => {
         setIsComplete(false);
       }
     }
-  }, [selectedTime, isRunning, timeLeft, settings.timerMode]);
+  }, [selectedTime, isRunning, timeLeft, settings.timerMode, alarmTime]);
 
   const handlePause = useCallback(() => {
     setIsRunning(false);
@@ -87,7 +119,10 @@ const Timer = () => {
 
   const handleReset = useCallback(() => {
     setIsRunning(false);
-    if (settings.timerMode === TimerModes.STOPWATCH) {
+    if (settings.timerMode === TimerModes.ALARM) {
+      setAlarmTime(null);
+      setIsComplete(false);
+    } else if (settings.timerMode === TimerModes.STOPWATCH) {
       setElapsedTime(0);
       setMilliseconds(0);
     } else {
@@ -101,15 +136,46 @@ const Timer = () => {
   // Utilities
   const calculateProgress = () => {
     if (settings.timerMode === TimerModes.STOPWATCH) {
-      // Calculate progress for one lap per minute
       const totalSeconds = elapsedTime + (milliseconds / 1000);
       return (totalSeconds % 60) / 60;
+    } else if (settings.timerMode === TimerModes.ALARM) {
+      if (!alarmTime || !isRunning) return 0;
+      
+      const now = currentTime;
+      const currentMinutes = (now.getHours() * 60) + now.getMinutes();
+      const currentSeconds = currentMinutes * 60 + now.getSeconds();
+      
+      const alarmHours = Math.floor(alarmTime / 3600);
+      const alarmMinutes = Math.floor((alarmTime % 3600) / 60);
+      let targetSeconds = (alarmHours * 60 + alarmMinutes) * 60;
+      
+      if (targetSeconds <= currentSeconds) {
+        targetSeconds += 24 * 60 * 60; // Add 24 hours
+      }
+      
+      const secondsUntilAlarm = targetSeconds - currentSeconds;
+      const totalSecondsInDay = 24 * 60 * 60;
+      
+      return (totalSecondsInDay - secondsUntilAlarm) / totalSecondsInDay;
     }
-    // Normal timer progress
     return timeLeft > 0 ? timeLeft / totalTime : 0;
   };
 
   const formatTime = (time, includeMilliseconds = false) => {
+    if (settings.timerMode === TimerModes.ALARM) {
+      if (time === null) return '--:--';
+      const totalHours = Math.floor(time / 3600);
+      const isPM = totalHours >= 12;
+      const hours = totalHours % 12 || 12;
+      const mins = Math.floor((time % 3600) / 60);
+      return (
+        <div className="time-with-meridiem">
+          <span>{`${hours}:${mins.toString().padStart(2, '0')}`}</span>
+          <span className="meridiem">{isPM ? 'PM' : 'AM'}</span>
+        </div>
+      );
+    }
+
     const hours = Math.floor(time / 3600);
     const mins = Math.floor((time % 3600) / 60);
     const secs = time % 60;
@@ -133,7 +199,17 @@ const Timer = () => {
 
   // Render methods
   const renderTimerInput = () => {
-    // Only show input methods in Timer mode
+    if (settings.timerMode === TimerModes.ALARM) {
+      if (isRunning) {
+        return (
+          <div className="timer-display">
+            {formatTime(alarmTime)}
+          </div>
+        );
+      }
+      return renderAlarmInput();
+    }
+
     if (settings.timerMode === TimerModes.STOPWATCH) {
       return (
         <div className="timer-display">
@@ -205,6 +281,53 @@ const Timer = () => {
     );
   };
 
+  const renderAlarmInput = () => {
+    const hours = alarmTime ? Math.floor((alarmTime % 43200) / 3600) || 12 : 12;
+    const minutes = alarmTime ? Math.floor((alarmTime % 3600) / 60) : 0;
+    const isPM = alarmTime ? Math.floor(alarmTime / 43200) > 0 : false;
+    
+    const handleTimeChange = (newHours, newMinutes, newIsPM) => {
+      // Convert to 24 hour format
+      let hours24 = newHours === 12 ? 0 : newHours;
+      if (newIsPM) hours24 += 12;
+      const newTime = (hours24 * 3600) + (newMinutes * 60);
+      setAlarmTime(newTime);
+    };
+
+    return (
+      <div className="alarm-scroll-container">
+        <TimerScroll
+          value={hours}
+          onChange={(h) => handleTimeChange(h, minutes, isPM)}
+          max={12}
+          min={1}
+          label="hour"
+        />
+        <TimerScroll
+          value={minutes}
+          onChange={(m) => handleTimeChange(hours, m, isPM)}
+          max={59}
+          min={0}
+          label="min"
+        />
+        <div className="ampm-selector">
+          <button
+            className={`ampm-button ${!isPM ? 'active' : ''}`}
+            onClick={() => handleTimeChange(hours, minutes, false)}
+          >
+            AM
+          </button>
+          <button
+            className={`ampm-button ${isPM ? 'active' : ''}`}
+            onClick={() => handleTimeChange(hours, minutes, true)}
+          >
+            PM
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // Customize controls based on mode
   const renderControls = () => {
     switch (settings.timerMode) {
@@ -266,7 +389,7 @@ const Timer = () => {
   };
 
   return (
-    <div className="timer">
+    <div className={`timer ${settings.timerMode.toLowerCase()}-mode`}>
       <button 
         className="settings-button" 
         onClick={() => setShowSettings(true)}
@@ -291,8 +414,8 @@ const Timer = () => {
       </div>
 
       {showNotification && (
-        <div className="timer-notification" style={{ backgroundColor: settings.theme.buttonColor }}>
-          Timer Complete!
+        <div className={`timer-notification ${settings.timerMode === TimerModes.ALARM ? 'alarm' : ''}`} style={{ backgroundColor: settings.theme.buttonColor }}>
+          {settings.timerMode === TimerModes.ALARM ? 'Alarm!' : 'Timer Complete!'}
         </div>
       )}
 
