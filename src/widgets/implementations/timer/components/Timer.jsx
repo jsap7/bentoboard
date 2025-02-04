@@ -190,7 +190,7 @@ const Timer = () => {
       return (
         <>
           <span className="main-time">{mainTime}</span>
-          <span className="milliseconds">{ms}</span>
+          <span className="milliseconds">.{ms}</span>
         </>
       );
     }

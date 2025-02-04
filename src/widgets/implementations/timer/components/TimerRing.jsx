@@ -25,7 +25,6 @@ const TimerRing = ({ progress, color }) => {
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      style={{ transform: 'rotate(-90deg)' }}
     >
       {/* Background ring */}
       <circle
@@ -49,6 +48,8 @@ const TimerRing = ({ progress, color }) => {
         strokeDashoffset={strokeDashoffset}
         strokeLinecap="round"
         style={{
+          transform: 'rotate(-90deg)',
+          transformOrigin: '50% 50%',
           transition: 'stroke-dashoffset 0.1s ease'
         }}
       />

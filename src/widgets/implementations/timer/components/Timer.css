@@ -91,10 +91,18 @@
   align-items: baseline;
 }
 
+.stopwatch-mode .main-time {
+  font-variant-numeric: tabular-nums;
+  min-width: 5ch;
+  text-align: right;
+}
+
 .stopwatch-mode .milliseconds {
   font-size: 24px;
-  opacity: 0.5;
-  margin-left: 2px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 1px;
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch;
 }
 
 .timer-ring-progress.stopwatch {
