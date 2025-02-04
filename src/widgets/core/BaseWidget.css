@@ -11,6 +11,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 .widget.minimized {
@@ -58,6 +59,11 @@
   transition: all 0.2s ease;
 }
 
+.widget-control svg {
+  width: 14px;
+  height: 14px;
+}
+
 .widget-control:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: var(--widget-control-hover-color, rgba(255, 255, 255, 0.9));
@@ -68,8 +74,13 @@
   color: #ff3b30;
 }
 
+.widget-control.settings:hover svg {
+  transform: rotate(30deg);
+}
+
 .widget-content {
   flex: 1;
   overflow: auto;
   padding: 16px;
+  position: relative;
 } 
