@@ -33,10 +33,47 @@ const SettingsPanel = ({ isVisible, onClose }) => {
   const { settings, updateTheme } = useGlobalSettings();
   
   const colors = [
-    '#007AFF', '#5856D6', '#FF2D55', '#FF3B30', '#FF9500',
-    '#34C759', '#AF52DE', '#FF6482', '#FF9F0A', '#FFD60A',
-    '#32ADE6', '#66D4CF', '#FF6482', '#FF9F0A', '#FFD60A',
-    '#64D2FF', '#30B0C7', '#FF6482', '#FF9F0A', '#FFD60A',
+    // Reds
+    '#FF0000', // Pure Red
+    '#FF3333', // Bright Red
+    '#FF4D4D', // Vibrant Red
+    '#FF6666', // Strong Red
+    '#FF8080', // Light Red
+    
+    // Oranges  
+    '#FF8C00', // Dark Orange
+    '#FFA033', // Strong Orange
+    '#FFB347', // Bright Orange
+    '#FFC266', // Vibrant Orange
+    '#FFD180', // Light Orange
+    
+    // Yellows
+    '#FFD700', // Golden Yellow
+    '#FFDD33', // Strong Yellow
+    '#FFE347', // Bright Yellow
+    '#FFE866', // Vibrant Yellow
+    '#FFED80', // Light Yellow
+    
+    // Greens
+    '#32CD32', // Pure Green
+    '#47D147', // Strong Green
+    '#5CD65C', // Bright Green
+    '#70DB70', // Vibrant Green
+    '#85E085', // Light Green
+    
+    // Blues
+    '#1E90FF', // Pure Blue
+    '#3D9EFF', // Strong Blue
+    '#5CACFF', // Bright Blue
+    '#7ABAFF', // Vibrant Blue
+    '#99C9FF', // Light Blue
+    
+    // Violets
+    '#8A2BE2', // Pure Violet
+    '#9D44E6', // Strong Violet
+    '#AF5DEA', // Bright Violet
+    '#C176EE', // Vibrant Violet
+    '#D38FF2', // Light Violet
   ];
 
   return (
@@ -73,18 +110,6 @@ const SettingsPanel = ({ isVisible, onClose }) => {
                 onColorSelect={(color) => updateTheme({ buttonColor: color, ringColor: color })}
               />
             </div>
-          </div>
-          <div className="settings-section">
-            <h3 className="settings-section-title">Behavior</h3>
-            <p className="settings-section-description">
-              Configure how widgets and the dashboard behave.
-            </p>
-          </div>
-          <div className="settings-section">
-            <h3 className="settings-section-title">Keyboard Shortcuts</h3>
-            <p className="settings-section-description">
-              Customize keyboard shortcuts for quick actions.
-            </p>
           </div>
         </div>
       </div>
