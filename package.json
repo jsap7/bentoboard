@@ -2,9 +2,8 @@
   "name": "desktop",
   "version": "1.0.0",
   "main": "electron/main.js",
-  "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"electron .\"",
+    "dev": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\"",
     "build": "vite build",
     "preview": "vite preview",
     "electron:package:mac": "npm run build && electron-builder -m -c.extraMetadata.main=electron/main.js",
@@ -24,20 +23,25 @@
     "directories": {
       "buildResources": "assets",
       "output": "release"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "category": "public.app-category.productivity"
     }
   },
   "dependencies": {
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "electron-is-dev": "^2.0.0",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
     "concurrently": "^8.0.1",
-    "electron": "^24.3.0",
-    "electron-builder": "^23.6.0",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
     "vite": "^4.3.5",
     "wait-on": "^7.0.1"
   }

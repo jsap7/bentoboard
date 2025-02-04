@@ -1,10 +1,6 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import isDev from 'electron-is-dev';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const isDev = require('electron-is-dev');
 
 function createWindow() {
   // Create the browser window.
@@ -14,11 +10,13 @@ function createWindow() {
     minWidth: 360,
     minHeight: 500,
     titleBarStyle: 'hiddenInset',
-    vibrancy: 'dark',
+    backgroundColor: '#00000000',
+    vibrancy: 'under-window',
     visualEffectState: 'active',
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
+      contextIsolation: false,
+      webSecurity: true
     },
   });
 
