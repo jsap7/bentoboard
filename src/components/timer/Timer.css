@@ -433,14 +433,6 @@
   font-family: 'SF Pro Display', sans-serif;
 }
 
-/* Remove old mode selector styles */
-.mode-selector,
-.mode-button,
-.mode-button:hover,
-.mode-button.active {
-  display: none;
-}
-
 .alarm-display {
   display: flex;
   flex-direction: column;

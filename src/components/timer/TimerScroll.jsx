@@ -111,7 +111,7 @@ const ScrollWheel = ({ value, onChange, max, min = 0, label }) => {
   );
 };
 
-const TimerScroll = ({ value, onChange, max, min, label }) => {
+const TimerScroll = ({ value, onChange, max, min, label, onTimeSet }) => {
   if (value !== undefined && onChange !== undefined) {
     return (
       <ScrollWheel
@@ -128,9 +128,11 @@ const TimerScroll = ({ value, onChange, max, min, label }) => {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
-    const totalSeconds = (minutes * 60) + seconds;
-    onTimeSet(totalSeconds);
-  }, [minutes, seconds]);
+    if (onTimeSet) {
+      const totalSeconds = (minutes * 60) + seconds;
+      onTimeSet(totalSeconds);
+    }
+  }, [minutes, seconds, onTimeSet]);
 
   return (
     <div className="timer-scroll-container">
@@ -143,7 +145,7 @@ const TimerScroll = ({ value, onChange, max, min, label }) => {
       <ScrollWheel
         value={seconds}
         onChange={setSeconds}
-        max={60}
+        max={59}
         label="seconds"
       />
     </div>
