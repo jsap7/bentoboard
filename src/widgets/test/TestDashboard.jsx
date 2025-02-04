@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { WidgetProvider, useWidgets } from '../core/WidgetContext';
-import { GlobalSettingsProvider, useGlobalSettings } from '../../context/GlobalSettingsContext';
+import { GlobalSettingsProvider, useGlobalSettings } from '../../shared/context/GlobalSettingsContext';
 import WidgetContainer from '../components/WidgetContainer';
 import { getAvailableWidgets } from '../registry/initializeWidgets';
 import './TestDashboard.css';

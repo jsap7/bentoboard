@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const SettingsContext = createContext();
 const SETTINGS_STORAGE_KEY = 'timer_settings';
@@ -77,7 +78,7 @@ const loadSavedSettings = () => {
   return defaultSettings;
 };
 
-export function SettingsProvider({ children }) {
+export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState(() => loadSavedSettings());
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -117,12 +118,16 @@ export function SettingsProvider({ children }) {
       {children}
     </SettingsContext.Provider>
   );
-}
+};
 
-export function useSettings() {
+SettingsProvider.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
+export const useSettings = () => {
   const context = useContext(SettingsContext);
   if (!context) {
     throw new Error('useSettings must be used within a SettingsProvider');
   }
   return context;
-} 
+}; 

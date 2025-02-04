@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSettings, TimerModes } from '../../context/SettingsContext.jsx';
+import { useSettings, TimerModes } from '../../../../shared/context/SettingsContext';
 import PropTypes from 'prop-types';
 
 const TimerRing = ({ progress, color }) => {

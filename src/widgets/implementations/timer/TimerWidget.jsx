@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import BaseWidget from '../../core/BaseWidget';
-import Timer from '../../../components/timer/Timer';
-import Settings from '../../../components/settings/Settings';
-import { TimerModes, InputMethods } from '../../../context/SettingsContext';
+import Timer from './components/Timer';
+import TimerSettings from './TimerSettings';
+import { TimerModes, InputMethods } from '../../../shared/context/SettingsContext';
 import './TimerWidget.css';
 
 const TimerWidget = ({ id, onClose, onMinimize, settings = {} }) => {
@@ -15,7 +15,7 @@ const TimerWidget = ({ id, onClose, onMinimize, settings = {} }) => {
       onMinimize={onMinimize}
       settings={settings}
       className="timer-widget"
-      SettingsComponent={Settings}
+      SettingsComponent={TimerSettings}
     >
       <Timer />
     </BaseWidget>

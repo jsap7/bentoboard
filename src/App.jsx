@@ -1,5 +1,5 @@
 import React from 'react'
-import { SettingsProvider } from './context/SettingsContext'
+import { SettingsProvider } from './shared/context/SettingsContext'
 import TestDashboard from './widgets/test/TestDashboard'
 
 function App() {

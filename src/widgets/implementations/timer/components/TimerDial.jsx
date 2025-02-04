@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useSettings } from '../../context/SettingsContext.jsx';
+import { useSettings } from '../../../../shared/context/SettingsContext';
 import './TimerDial.css';
 
 const MINUTES_PER_CLICK = 1; // How many minutes per click/notch

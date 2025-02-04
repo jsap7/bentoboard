@@ -7,13 +7,12 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
-  justify-content: flex-end;
-  align-items: stretch;
+  justify-content: center;
+  align-items: center;
   z-index: 9999;
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
-  padding: 16px;
 }
 
 .settings-overlay.visible {
@@ -22,50 +21,72 @@
 }
 
 .settings-sidebar {
-  width: 400px;
-  height: fit-content;
-  background: #1a1a1a;
-  padding: 20px;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
-  transform: translateX(calc(100% + 16px));
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 16px;
-  margin-left: 16px;
+  width: 320px;
+  background: #1E1E1E;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+  transform: scale(0.95);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
 }
 
 .settings-sidebar.visible {
-  transform: translateX(0);
+  transform: scale(1);
+  opacity: 1;
 }
 
 .settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .settings-title {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
 }
 
 .settings-close {
+  width: 28px;
+  height: 28px;
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.2s;
+  padding: 0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .settings-close:hover {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.9);
+}
+
+.settings-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .settings-section {
@@ -81,6 +102,13 @@
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 12px;
+}
+
+/* Grid layout for buttons */
+.settings-button-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
 /* Common button styles for settings */
@@ -119,13 +147,6 @@
 .settings-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* Grid layout for buttons */
-.settings-button-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
 }
 
 /* Settings controls */

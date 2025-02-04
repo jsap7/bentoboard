@@ -2,10 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import TimerRing from './TimerRing';
 import TimerDial from './TimerDial';
 import TimerScroll from './TimerScroll';
-import Settings from '../settings/Settings';
-import { useSettings, InputMethods, TimerModes } from '../../context/SettingsContext.jsx';
-import { playNotificationSound } from '../../utils/notification.js';
-import { useGlobalSettings } from '../../context/GlobalSettingsContext';
+import { useSettings, InputMethods, TimerModes } from '../../../../shared/context/SettingsContext';
+import { playNotificationSound } from '../../../../shared/utils/notification';
+import { useGlobalSettings } from '../../../../shared/context/GlobalSettingsContext';
 import './Timer.css';
 
 const Timer = () => {
