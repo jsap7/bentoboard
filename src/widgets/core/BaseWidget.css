@@ -1,0 +1,75 @@
+.widget {
+  background-color: var(--widget-bg-color, rgba(28, 28, 30, 0.8));
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  min-height: 150px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.widget.minimized {
+  height: auto !important;
+  min-height: unset;
+}
+
+.widget.minimized .widget-content {
+  display: none;
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  user-select: none;
+}
+
+.widget-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--widget-title-color, rgba(255, 255, 255, 0.9));
+}
+
+.widget-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.widget-control {
+  background: none;
+  border: none;
+  color: var(--widget-control-color, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.widget-control:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--widget-control-hover-color, rgba(255, 255, 255, 0.9));
+}
+
+.widget-control.close:hover {
+  background-color: rgba(255, 59, 48, 0.2);
+  color: #ff3b30;
+}
+
+.widget-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+} 

@@ -1,0 +1,127 @@
+.test-dashboard {
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add a toolbar for future widget controls */
+.test-dashboard-toolbar {
+  padding: 12px 16px;
+  background-color: rgba(28, 28, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  position: relative;
+  z-index: 1001;
+}
+
+.test-dashboard-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  z-index: 1000;
+}
+
+.add-widget-button {
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.add-widget-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.add-widget-button svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+  transition: transform 0.2s ease;
+}
+
+.add-widget-button:hover svg {
+  transform: rotate(90deg);
+}
+
+.widget-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 16px;
+  background-color: rgba(28, 28, 30, 0.95);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.widget-dropdown-item {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.widget-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.widget-dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.widget-dropdown-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.widget-dropdown-item-title {
+  font-weight: 500;
+  color: #fff;
+}
+
+.widget-dropdown-item-description {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.widget-dropdown-item-size {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+} 

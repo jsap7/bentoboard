@@ -1,0 +1,82 @@
+.timer-widget .widget-content {
+  background-color: #161616;
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.timer-widget .timer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.timer-widget .timer-ring-container {
+  flex: 1;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  position: relative;
+}
+
+.timer-widget .timer-display {
+  font-size: 42px;
+  font-weight: 300;
+}
+
+.timer-widget .timer-input {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.timer-widget .timer-input input {
+  font-size: 42px;
+}
+
+.timer-widget .timer-controls {
+  position: relative;
+  bottom: 0;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.timer-widget .timer-button {
+  min-width: 80px;
+  padding: 8px 16px;
+}
+
+.timer-widget .settings-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* Ensure the timer ring fits nicely in the widget */
+.timer-widget .timer-ring {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Adjust timer controls spacing */
+.timer-widget .timer-controls {
+  margin-top: 12px;
+  gap: 8px;
+}
+
+/* Make sure the settings panel doesn't overflow */
+.timer-widget .settings-panel {
+  max-height: calc(100% - 48px);
+  overflow-y: auto;
+} 

@@ -389,7 +389,7 @@ const Timer = () => {
   };
 
   return (
-    <div className={`timer ${settings.timerMode.toLowerCase()}-mode`}>
+    <div className={`timer ${settings.timerMode}-mode`}>
       <button 
         className="settings-button" 
         onClick={() => setShowSettings(true)}
@@ -402,7 +402,6 @@ const Timer = () => {
       </button>
 
       <div className="timer-ring-container">
-        <div className="mode-title">{settings.timerMode}</div>
         <TimerRing progress={calculateProgress()} />
         <div className="timer-display-container">
           {renderTimerInput()}

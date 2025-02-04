@@ -1,48 +1,16 @@
 .timer {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-  background-color: #161616;
-}
-
-.settings-button {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 10px;
-  z-index: 100;
-}
-
-.settings-button:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.1);
-  transform: rotate(30deg);
-}
-
-.settings-button svg {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.3s ease;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 .timer-ring-container {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,19 +18,85 @@
 
 .timer-ring {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
 }
 
 .timer-ring-progress {
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
   transition: stroke-dashoffset 16ms linear;
-  will-change: stroke-dashoffset, transform;
 }
 
-/* Smoother animation for stopwatch mode */
+.timer-display-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.timer-display {
+  font-size: 42px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  line-height: 1;
+}
+
+.timer-controls {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.timer-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.timer-button.reset {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.settings-button {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  border-radius: 6px;
+  z-index: 2;
+}
+
+/* Mode-specific styles */
+.stopwatch-mode .timer-display {
+  display: flex;
+  align-items: baseline;
+}
+
+.stopwatch-mode .milliseconds {
+  font-size: 24px;
+  opacity: 0.5;
+  margin-left: 2px;
+}
+
 .timer-ring-progress.stopwatch {
   transition: stroke-dashoffset 16ms linear;
   will-change: stroke-dashoffset, transform;
@@ -94,29 +128,6 @@
   }
 }
 
-.timer-display-container {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}
-
-.timer-display {
-  font-size: 84px;
-  font-weight: 200;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  color: rgba(255, 255, 255, 0.85);
-  text-align: center;
-  transition: color 0.3s ease;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-/* Timer mode specific styles */
 .timer-mode .timer-display {
   display: flex;
   align-items: center;
@@ -134,7 +145,6 @@
   animation: pulse 1.5s infinite;
 }
 
-/* Alarm mode specific styles */
 .alarm-mode .timer-display {
   display: flex;
   flex-direction: column;
@@ -155,7 +165,6 @@
   margin-left: 4px;
 }
 
-/* Alarm scroll container specific styles */
 .alarm-scroll-container {
   display: flex;
   align-items: center;
@@ -235,102 +244,6 @@
   opacity: 0.6;
 }
 
-.timer-controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.timer-input {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  font-size: 84px;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-.timer-input input {
-  width: 100px;
-  padding: 0;
-  font-size: 84px;
-  font-weight: 200;
-  border: none;
-  background: none;
-  color: rgba(255, 255, 255, 0.85);
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  transition: all 0.2s ease;
-  caret-color: var(--accent-color);
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-.timer-input input:first-child {
-  text-align: right;
-  margin-right: -3px;
-}
-
-.timer-input input:last-child {
-  text-align: left;
-  margin-left: -3px;
-}
-
-.timer-input input:focus {
-  outline: none;
-}
-
-/* Remove spinner buttons from number inputs */
-.timer-input input::-webkit-outer-spin-button,
-.timer-input input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.timer-input input[type=number] {
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-
-.timer-input span {
-  font-size: 84px;
-  font-weight: 200;
-  color: rgba(255, 255, 255, 0.4);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  user-select: none;
-  padding: 0 2px;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-.timer-button {
-  padding: 12px 24px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #fff;
-  background-color: var(--accent-color);
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-  font-family: 'SF Pro Display', sans-serif;
-}
-
-.timer-button:hover {
-  opacity: 0.9;
-}
-
-.timer-button.reset {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.timer-button.reset:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
 .timer-presets {
   display: flex;
   flex-wrap: wrap;
@@ -384,11 +297,11 @@
 }
 
 .timer-notification {
-  position: fixed;
-  bottom: 20px;
+  position: absolute;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 12px 24px;
+  padding: 8px 16px;
   background-color: var(--accent-color);
   color: #fff;
   border-radius: 8px;
@@ -420,19 +333,6 @@
   }
 }
 
-.mode-title {
-  position: absolute;
-  top: -70px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 44px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  letter-spacing: -0.5px;
-  text-transform: capitalize;
-  font-family: 'SF Pro Display', sans-serif;
-}
-
 .alarm-display {
   display: flex;
   flex-direction: column;
@@ -455,13 +355,46 @@
   margin-top: -8px;
 }
 
-/* Update timer input for alarm mode */
-.timer-input input.alarm-input {
-  width: 60px;
-  text-align: center;
+.timer-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
-/* Notification style update for alarm */
+.timer-input input {
+  width: 80px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 42px;
+  font-weight: 300;
+  text-align: center;
+  padding: 0;
+  font-family: inherit;
+}
+
+.timer-input input:focus {
+  outline: none;
+}
+
+.timer-input span {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 42px;
+  font-weight: 300;
+}
+
+/* Remove spinner buttons from number inputs */
+.timer-input input::-webkit-outer-spin-button,
+.timer-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.timer-input input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .timer-notification.alarm {
   display: flex;
   align-items: center;
@@ -537,7 +470,6 @@
   background: var(--accent-color);
 }
 
-/* Update scroll wheel styles */
 .scroll-wheel {
   position: relative;
   width: 60px;
@@ -592,12 +524,9 @@
   letter-spacing: 0.5px;
 }
 
-/* Stopwatch specific styles */
 .stopwatch-mode .timer-display {
   display: flex;
   align-items: baseline;
-  justify-content: center;
-  gap: 2px;
 }
 
 .stopwatch-mode .timer-display .main-time {
@@ -606,13 +535,9 @@
 }
 
 .stopwatch-mode .timer-display .milliseconds {
-  font-size: 22px;
+  font-size: 24px;
   opacity: 0.5;
-  font-weight: 300;
-  min-width: 2ch;
-  text-align: left;
-  margin-left: 1px;
-  letter-spacing: 0px;
+  margin-left: 2px;
 }
 
 
