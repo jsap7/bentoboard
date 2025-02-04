@@ -1,0 +1,179 @@
+.todo-widget .widget-content {
+  background-color: #161616;
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.todo-form {
+  display: flex;
+  gap: 8px;
+}
+
+.todo-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.todo-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.todo-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.todo-add-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.todo-add-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.todo-add-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.todo-add-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.todo-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.todo-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.todo-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.todo-checkbox:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.todo-checkbox svg {
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+}
+
+.todo-item.completed .todo-checkbox {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: transparent;
+}
+
+.todo-item.completed .todo-checkbox svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.todo-text {
+  flex: 1;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.todo-item.completed .todo-text {
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+}
+
+.todo-delete {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 4px;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.todo-item:hover .todo-delete {
+  opacity: 1;
+}
+
+.todo-delete:hover {
+  background-color: rgba(255, 59, 48, 0.2);
+  color: #ff3b30;
+}
+
+.todo-delete svg {
+  width: 16px;
+  height: 16px;
+}
+
+.todo-empty {
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 14px;
+} 

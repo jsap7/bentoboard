@@ -10,7 +10,7 @@
   justify-content: flex-end;
   align-items: stretch;
   z-index: 9999;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.3s ease;
   pointer-events: none;
   padding: 16px;
@@ -23,15 +23,16 @@
 
 .settings-sidebar {
   width: 400px;
-  height: 100%;
+  height: fit-content;
   background: #1a1a1a;
-  padding: 24px;
+  padding: 20px;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
-  overflow-y: auto;
   transform: translateX(calc(100% + 16px));
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 16px;
   margin-left: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .settings-sidebar.visible {
@@ -42,11 +43,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .settings-title {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
@@ -68,43 +69,45 @@
 }
 
 .settings-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
 }
 
 .settings-section-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .mode-selector {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
-  opacity: 1;
-  pointer-events: auto;
+  gap: 8px;
+  margin-bottom: 0;
 }
 
 .mode-button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px;
+  gap: 6px;
+  padding: 12px 8px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 10px;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .mode-button svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   stroke-width: 2;
 }
 
@@ -123,7 +126,7 @@
 .input-method-selector {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 8px;
   opacity: 0.5;
   pointer-events: none;
   transition: all 0.2s;
@@ -138,19 +141,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px;
+  gap: 6px;
+  padding: 12px 8px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 10px;
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: all 0.2s;
+  font-size: 13px;
 }
 
 .input-button svg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .input-button:hover:not(:disabled) {
@@ -167,27 +171,4 @@
 .input-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.theme-color-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-}
-
-.color-button {
-  width: 100%;
-  aspect-ratio: 1;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.color-button:hover {
-  transform: scale(1.1);
-}
-
-.color-button.active {
-  box-shadow: 0 0 0 2px #fff;
 } 

@@ -5,6 +5,7 @@ import TimerScroll from './TimerScroll';
 import Settings from '../settings/Settings';
 import { useSettings, InputMethods, TimerModes } from '../../context/SettingsContext.jsx';
 import { playNotificationSound } from '../../utils/notification.js';
+import { useGlobalSettings } from '../../context/GlobalSettingsContext';
 import './Timer.css';
 
 const Timer = () => {
@@ -22,11 +23,12 @@ const Timer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   
   const { settings } = useSettings();
+  const { settings: globalSettings } = useGlobalSettings();
 
   // Effects
   useEffect(() => {
-    document.documentElement.style.setProperty('--accent-color', settings.theme.buttonColor);
-  }, [settings.theme]);
+    document.documentElement.style.setProperty('--accent-color', globalSettings.theme.buttonColor);
+  }, [globalSettings.theme]);
 
   useEffect(() => {
     let interval;
@@ -338,7 +340,7 @@ const Timer = () => {
               <button 
                 className="timer-button" 
                 onClick={handleStart}
-                style={{ backgroundColor: settings.theme.buttonColor }}
+                style={{ backgroundColor: globalSettings.theme.buttonColor }}
               >
                 {timeLeft > 0 ? 'Resume' : 'Start'}
               </button>
@@ -346,7 +348,7 @@ const Timer = () => {
               <button 
                 className="timer-button" 
                 onClick={handlePause}
-                style={{ backgroundColor: settings.theme.buttonColor }}
+                style={{ backgroundColor: globalSettings.theme.buttonColor }}
               >
                 Pause
               </button>
@@ -363,7 +365,7 @@ const Timer = () => {
             <button 
               className="timer-button" 
               onClick={isRunning ? handlePause : handleStart}
-              style={{ backgroundColor: settings.theme.buttonColor }}
+              style={{ backgroundColor: globalSettings.theme.buttonColor }}
             >
               {isRunning ? 'Stop' : 'Start'}
             </button>
@@ -379,7 +381,7 @@ const Timer = () => {
             <button 
               className="timer-button" 
               onClick={isRunning ? handlePause : handleStart}
-              style={{ backgroundColor: settings.theme.buttonColor }}
+              style={{ backgroundColor: globalSettings.theme.buttonColor }}
             >
               {isRunning ? 'Disable' : 'Enable'}
             </button>
@@ -389,7 +391,7 @@ const Timer = () => {
   };
 
   return (
-    <div className={`timer ${settings.timerMode}-mode`}>
+    <div className={`timer ${settings.timerMode}-mode`} style={{ '--timer-color': globalSettings.theme.buttonColor }}>
       <button 
         className="settings-button" 
         onClick={() => setShowSettings(true)}
@@ -402,7 +404,10 @@ const Timer = () => {
       </button>
 
       <div className="timer-ring-container">
-        <TimerRing progress={calculateProgress()} />
+        <TimerRing 
+          progress={calculateProgress()} 
+          color={globalSettings.theme.ringColor}
+        />
         <div className="timer-display-container">
           {renderTimerInput()}
         </div>
@@ -413,7 +418,7 @@ const Timer = () => {
       </div>
 
       {showNotification && (
-        <div className={`timer-notification ${settings.timerMode === TimerModes.ALARM ? 'alarm' : ''}`} style={{ backgroundColor: settings.theme.buttonColor }}>
+        <div className={`timer-notification ${settings.timerMode === TimerModes.ALARM ? 'alarm' : ''}`} style={{ backgroundColor: globalSettings.theme.buttonColor }}>
           {settings.timerMode === TimerModes.ALARM ? 'Alarm!' : 'Timer Complete!'}
         </div>
       )}

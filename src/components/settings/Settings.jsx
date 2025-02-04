@@ -93,7 +93,7 @@ const Settings = ({ onClose }) => {
         onClick={e => e.stopPropagation()}
       >
         <div className="settings-header">
-          <h2 className="settings-title">Settings</h2>
+          <h2 className="settings-title">Timer Settings</h2>
           <button className="settings-close" onClick={handleClose}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
@@ -173,27 +173,6 @@ const Settings = ({ onClose }) => {
               </svg>
               Scroll
             </button>
-          </div>
-        </div>
-
-        <div className="settings-section">
-          <div className="settings-section-title">Theme Color</div>
-          <div className="theme-color-grid">
-            {[
-              '#FF4136', '#FF6B6B', '#FF8787', '#FFA8A8', '#FFC9C9',
-              '#FF851B', '#FFA94D', '#FFC078', '#FFD8A8', '#FFE5D0',
-              '#FFDC00', '#FFE066', '#FFE876', '#FFF3BF', '#FFF9DB',
-              '#2ECC40', '#51CF66', '#69DB7C', '#8CE99A', '#B2F2BB',
-              '#0074D9', '#339AF0', '#4DABF7', '#74C0FC', '#A5D8FF',
-              '#B10DC9', '#845EF7', '#9775FA', '#B197FC', '#D0BFFF'
-            ].map((color, index) => (
-              <button
-                key={index}
-                className={`color-button ${settings.theme.buttonColor === color ? 'active' : ''}`}
-                style={{ backgroundColor: color }}
-                onClick={() => updateSettings({ theme: { ...settings.theme, buttonColor: color } })}
-              />
-            ))}
           </div>
         </div>
       </div>

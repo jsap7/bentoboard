@@ -35,12 +35,7 @@ const timerWidgetConfig = {
   description: 'A versatile timer widget with multiple modes (Timer, Stopwatch, Alarm)',
   defaultSettings: {
     timerMode: TimerModes.TIMER,
-    inputMethod: InputMethods.SCROLL,
-    theme: {
-      ringColor: '#007AFF',
-      buttonColor: '#007AFF',
-      backgroundColor: '#161616'
-    }
+    inputMethod: InputMethods.SCROLL
   },
   defaultSize: {
     width: 5,

@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "npm run dev",
+			"problemMatcher": [],
+			"label": "npm: dev",
+			"detail": "concurrently \"vite\" \"wait-on tcp:5173 && electron .\""
+		}
+	]
+}

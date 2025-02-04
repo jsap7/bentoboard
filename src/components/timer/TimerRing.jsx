@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useSettings, TimerModes } from '../../context/SettingsContext.jsx';
+import PropTypes from 'prop-types';
 
-const TimerRing = ({ progress }) => {
+const TimerRing = ({ progress, color }) => {
   const { settings } = useSettings();
   const [isLoopComplete, setIsLoopComplete] = useState(false);
   const size = 280;
-  const strokeWidth = 4;
+  const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - progress);
+  const strokeDashoffset = circumference - (progress * circumference);
 
   // Handle loop completion animation
   useEffect(() => {
@@ -20,7 +21,12 @@ const TimerRing = ({ progress }) => {
   }, [progress, settings.timerMode]);
 
   return (
-    <svg className="timer-ring" width={size} height={size}>
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ transform: 'rotate(-90deg)' }}
+    >
       {/* Background ring */}
       <circle
         cx={size / 2}
@@ -37,14 +43,22 @@ const TimerRing = ({ progress }) => {
         cy={size / 2}
         r={radius}
         fill="none"
-        stroke={settings.theme.buttonColor}
+        stroke={color}
         strokeWidth={strokeWidth}
         strokeDasharray={circumference}
         strokeDashoffset={strokeDashoffset}
         strokeLinecap="round"
+        style={{
+          transition: 'stroke-dashoffset 0.1s ease'
+        }}
       />
     </svg>
   );
+};
+
+TimerRing.propTypes = {
+  progress: PropTypes.number.isRequired,
+  color: PropTypes.string.isRequired
 };
 
 export default TimerRing; 
