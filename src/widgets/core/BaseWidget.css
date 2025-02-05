@@ -32,11 +32,45 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.widget-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.widget-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: grab;
+  color: var(--widget-control-color, rgba(255, 255, 255, 0.6));
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+}
+
+.widget-drag-handle:active {
+  cursor: grabbing;
+}
+
+.widget-drag-handle svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* Show header on widget hover or when settings are open */
 .widget:hover .widget-header,
 .widget.settings-open .widget-header {
   opacity: 1;
   transform: translateY(0);
+}
+
+.widget:hover .widget-drag-handle,
+.widget.settings-open .widget-drag-handle {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .widget-title {
@@ -118,4 +152,24 @@
 
 .widget:hover .widget-content {
   margin-top: 44px;
+}
+
+/* Dragging styles */
+.widget-wrapper[data-rbd-dragging-over="true"] {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.widget-wrapper[data-rbd-dragging="true"] {
+  opacity: 0.8;
+  transform: scale(1.02);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.widget-wrapper[data-rbd-dragging="true"] .widget-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.widget-wrapper[data-rbd-dragging="true"] .widget-drag-handle {
+  cursor: grabbing;
 } 

@@ -3,6 +3,14 @@ import PropTypes from 'prop-types';
 import SettingsPortal from './SettingsPortal';
 import './BaseWidget.css';
 
+const DragHandle = ({ dragHandleProps }) => (
+  <div className="widget-drag-handle" {...dragHandleProps}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M8 9h8M8 15h8" />
+    </svg>
+  </div>
+);
+
 const BaseWidget = ({ 
   id,
   title,
@@ -12,7 +20,8 @@ const BaseWidget = ({
   className,
   settings = {},
   onSettingsChange,
-  SettingsComponent
+  SettingsComponent,
+  dragHandleProps
 }) => {
   const [showSettings, setShowSettings] = useState(false);
 
@@ -30,7 +39,10 @@ const BaseWidget = ({
     <>
       <div className={`widget ${className || ''} ${showSettings ? 'settings-open' : ''}`}>
         <div className="widget-header">
-          <div className="widget-title">{title}</div>
+          <div className="widget-header-left">
+            <DragHandle dragHandleProps={dragHandleProps} />
+            <div className="widget-title">{title}</div>
+          </div>
           <div className="widget-controls">
             {SettingsComponent && (
               <button 
@@ -76,6 +88,10 @@ const BaseWidget = ({
   );
 };
 
+DragHandle.propTypes = {
+  dragHandleProps: PropTypes.object
+};
+
 BaseWidget.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
@@ -85,7 +101,8 @@ BaseWidget.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   settings: PropTypes.object,
-  SettingsComponent: PropTypes.elementType
+  SettingsComponent: PropTypes.elementType,
+  dragHandleProps: PropTypes.object
 };
 
 export default BaseWidget; 

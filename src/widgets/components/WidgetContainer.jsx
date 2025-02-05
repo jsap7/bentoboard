@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import widgetRegistry from '../registry/WidgetRegistry';
 import { useWidgets } from '../core/WidgetContext';
@@ -21,6 +21,10 @@ const ResizeHandle = ({ onResizeStart }) => (
 const WidgetContainer = ({ className }) => {
   const { widgets, removeWidget, updateWidget } = useWidgets();
   const [isResizing, setIsResizing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [draggedWidget, setDraggedWidget] = useState(null);
+  const [dropPosition, setDropPosition] = useState(null);
+  const containerRef = useRef(null);
 
   const handleWidgetClose = (widgetId) => {
     removeWidget(widgetId);
@@ -33,6 +37,24 @@ const WidgetContainer = ({ className }) => {
   const handleWidgetSettingsChange = (widgetId, newSettings) => {
     updateWidget(widgetId, { settings: newSettings });
   };
+
+  const checkCollision = useCallback((x, y, width, height, widgetId) => {
+    return widgets.some(otherWidget => {
+      if (otherWidget.id === widgetId) return false;
+
+      const otherX = otherWidget.position?.x || 0;
+      const otherY = otherWidget.position?.y || 0;
+      const otherWidth = otherWidget.size?.width || 1;
+      const otherHeight = otherWidget.size?.height || 1;
+
+      return (
+        x < otherX + otherWidth &&
+        x + width > otherX &&
+        y < otherY + otherHeight &&
+        y + height > otherY
+      );
+    });
+  }, [widgets]);
 
   const handleResizeStart = (widgetId, widgetConfig, e) => {
     e.preventDefault();
@@ -85,9 +107,113 @@ const WidgetContainer = ({ className }) => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  const handleDragStart = (e, widget) => {
+    setIsDragging(true);
+    setDraggedWidget(widget);
+    e.dataTransfer.setData('text/plain', widget.id);
+    e.dataTransfer.effectAllowed = 'move';
+
+    // Add dragging class to the dragged element
+    e.target.classList.add('dragging');
+
+    // Create a drag image that maintains the original size
+    const dragImage = e.target.cloneNode(true);
+    const originalRect = e.target.getBoundingClientRect();
+    Object.assign(dragImage.style, {
+      position: 'fixed',
+      top: '-9999px',
+      left: '-9999px',
+      width: `${originalRect.width}px`,
+      height: `${originalRect.height}px`,
+      opacity: '0.5',
+      pointerEvents: 'none',
+      zIndex: '-1'
+    });
+    document.body.appendChild(dragImage);
+    e.dataTransfer.setDragImage(dragImage, 0, 0);
+    setTimeout(() => document.body.removeChild(dragImage), 0);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    if (!draggedWidget) return;
+
+    e.dataTransfer.dropEffect = 'move';
+
+    // Show grid during drag
+    if (!containerRef.current.classList.contains('dragging')) {
+      containerRef.current.classList.add('dragging');
+    }
+
+    // Calculate potential drop position
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const columnWidth = containerRect.width / 12;
+    const rowHeight = 150;
+
+    const dropX = Math.round((e.clientX - containerRect.left) / columnWidth);
+    const dropY = Math.round((e.clientY - containerRect.top) / rowHeight);
+
+    // Ensure the position is within bounds
+    const maxX = 12 - (draggedWidget.size?.width || 1);
+    const newX = Math.max(0, Math.min(maxX, dropX));
+    const newY = Math.max(0, dropY);
+
+    // Check if this is a valid drop position
+    const hasCollision = checkCollision(
+      newX,
+      newY,
+      draggedWidget.size?.width || 1,
+      draggedWidget.size?.height || 1,
+      draggedWidget.id
+    );
+
+    setDropPosition({
+      x: newX,
+      y: newY,
+      isValid: !hasCollision
+    });
+
+    // Update container class based on validity
+    containerRef.current.classList.toggle('drop-valid', !hasCollision);
+    containerRef.current.classList.toggle('drop-invalid', hasCollision);
+  };
+
+  const handleDragEnd = (e) => {
+    setIsDragging(false);
+    setDraggedWidget(null);
+    setDropPosition(null);
+    e.target.classList.remove('dragging');
+    containerRef.current.classList.remove('dragging', 'drop-valid', 'drop-invalid');
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    setDraggedWidget(null);
+    setDropPosition(null);
+    containerRef.current.classList.remove('dragging', 'drop-valid', 'drop-invalid');
+
+    if (!dropPosition || !dropPosition.isValid) return;
+
+    const widgetId = e.dataTransfer.getData('text/plain');
+    const widget = widgets.find(w => w.id === widgetId);
+    if (!widget) return;
+
+    updateWidget(widget.id, {
+      position: { x: dropPosition.x, y: dropPosition.y }
+    });
+  };
+
   return (
-    <div className={`widget-container ${className || ''} ${isResizing ? 'resizing' : ''}`}>
-      {widgets.map(widget => {
+    <div
+      ref={containerRef}
+      className={`widget-container ${className || ''} ${isResizing ? 'resizing' : ''} ${
+        isDragging ? 'dragging' : ''
+      }`}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {widgets.map((widget, index) => {
         const widgetConfig = widgetRegistry.getWidget(widget.type);
         if (!widgetConfig) return null;
 
@@ -102,7 +228,7 @@ const WidgetContainer = ({ className }) => {
         const gridRow = widget.position?.y ? 
           `${widget.position.y + 1} / span ${height}` : 
           `span ${height}`;
-        
+
         return (
           <div
             key={widget.id}
@@ -111,6 +237,9 @@ const WidgetContainer = ({ className }) => {
               gridColumn,
               gridRow,
             }}
+            draggable="true"
+            onDragStart={(e) => handleDragStart(e, widget)}
+            onDragEnd={handleDragEnd}
           >
             <WidgetComponent
               id={widget.id}
