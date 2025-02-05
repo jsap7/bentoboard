@@ -26,6 +26,50 @@ export function WidgetProvider({ children, initialWidgets = [] }) {
     }
   }, [widgets]);
 
+  const findNextPosition = useCallback((widgetSize) => {
+    const GRID_COLUMNS = 12;
+    const GRID_ROWS = 8; // Reasonable maximum
+    const grid = Array(GRID_ROWS).fill().map(() => Array(GRID_COLUMNS).fill(false));
+
+    // Mark occupied cells
+    widgets.forEach(widget => {
+      const width = widget.size?.width || widgetRegistry.getWidget(widget.type).defaultSize.width;
+      const height = widget.size?.height || widgetRegistry.getWidget(widget.type).defaultSize.height;
+      const x = widget.position?.x || 0;
+      const y = widget.position?.y || 0;
+
+      for (let i = y; i < Math.min(y + height, GRID_ROWS); i++) {
+        for (let j = x; j < Math.min(x + width, GRID_COLUMNS); j++) {
+          grid[i][j] = true;
+        }
+      }
+    });
+
+    // Find first available position
+    for (let y = 0; y < GRID_ROWS; y++) {
+      for (let x = 0; x < GRID_COLUMNS; x++) {
+        if (x + widgetSize.width > GRID_COLUMNS) continue;
+        
+        let fits = true;
+        for (let i = y; i < Math.min(y + widgetSize.height, GRID_ROWS); i++) {
+          for (let j = x; j < Math.min(x + widgetSize.width, GRID_COLUMNS); j++) {
+            if (grid[i]?.[j]) {
+              fits = false;
+              break;
+            }
+          }
+          if (!fits) break;
+        }
+        
+        if (fits) {
+          return { x, y };
+        }
+      }
+    }
+
+    return { x: 0, y: 0 }; // Fallback if no space found
+  }, [widgets]);
+
   const addWidget = useCallback((type) => {
     if (!widgetRegistry.hasWidget(type)) {
       console.error(`Widget type "${type}" not found`);
@@ -33,16 +77,19 @@ export function WidgetProvider({ children, initialWidgets = [] }) {
     }
 
     const widgetConfig = widgetRegistry.getWidget(type);
+    const position = findNextPosition(widgetConfig.defaultSize);
+    
     const newWidget = {
       id: `${type}-${Date.now()}`,
       type,
       settings: { ...widgetConfig.defaultSettings },
-      size: { ...widgetConfig.defaultSize }
+      size: { ...widgetConfig.defaultSize },
+      position
     };
 
     setWidgets(currentWidgets => [...currentWidgets, newWidget]);
     return newWidget.id;
-  }, []);
+  }, [findNextPosition]);
 
   const removeWidget = useCallback((widgetId) => {
     setWidgets(currentWidgets => 

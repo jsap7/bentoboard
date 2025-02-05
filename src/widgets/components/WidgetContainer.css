@@ -2,13 +2,37 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-auto-rows: minmax(100px, 150px);
-  gap: 16px;
-  padding: 16px;
+  gap: 12px;
+  padding: 12px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   overflow: auto;
   min-height: 100vh;
+  position: relative;
+  background-color: #0F0F10;
+}
+
+/* Grid overlay for resizing */
+.widget-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255 255 255 / 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255 255 255 / 0.2) 1px, transparent 1px);
+  background-size: calc((100% - 11px * 11) / 12 + 12px) calc(150px + 12px);
+  background-position: -6px -6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.widget-container.resizing::before {
+  opacity: 1;
 }
 
 .widget-wrapper {

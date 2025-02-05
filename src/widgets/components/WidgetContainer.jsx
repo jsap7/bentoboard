@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import widgetRegistry from '../registry/WidgetRegistry';
 import { useWidgets } from '../core/WidgetContext';
@@ -20,6 +20,7 @@ const ResizeHandle = ({ onResizeStart }) => (
 
 const WidgetContainer = ({ className }) => {
   const { widgets, removeWidget, updateWidget } = useWidgets();
+  const [isResizing, setIsResizing] = useState(false);
 
   const handleWidgetClose = (widgetId) => {
     removeWidget(widgetId);
@@ -35,6 +36,7 @@ const WidgetContainer = ({ className }) => {
 
   const handleResizeStart = (widgetId, widgetConfig, e) => {
     e.preventDefault();
+    setIsResizing(true);
     const startX = e.clientX;
     const startY = e.clientY;
     const widget = widgets.find(w => w.id === widgetId);
@@ -74,6 +76,7 @@ const WidgetContainer = ({ className }) => {
     };
 
     const handleMouseUp = () => {
+      setIsResizing(false);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
@@ -83,20 +86,30 @@ const WidgetContainer = ({ className }) => {
   };
 
   return (
-    <div className={`widget-container ${className || ''}`}>
+    <div className={`widget-container ${className || ''} ${isResizing ? 'resizing' : ''}`}>
       {widgets.map(widget => {
         const widgetConfig = widgetRegistry.getWidget(widget.type);
         if (!widgetConfig) return null;
 
         const WidgetComponent = widgetConfig.component;
+        const width = widget.size?.width || widgetConfig.defaultSize.width;
+        const height = widget.size?.height || widgetConfig.defaultSize.height;
+        
+        // Calculate grid position
+        const gridColumn = widget.position?.x ? 
+          `${widget.position.x + 1} / span ${width}` : 
+          `span ${width}`;
+        const gridRow = widget.position?.y ? 
+          `${widget.position.y + 1} / span ${height}` : 
+          `span ${height}`;
         
         return (
           <div
             key={widget.id}
             className="widget-wrapper"
             style={{
-              gridColumn: `span ${widget.size?.width || widgetConfig.defaultSize.width}`,
-              gridRow: `span ${widget.size?.height || widgetConfig.defaultSize.height}`
+              gridColumn,
+              gridRow,
             }}
           >
             <WidgetComponent

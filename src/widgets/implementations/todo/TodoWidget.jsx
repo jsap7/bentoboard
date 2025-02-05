@@ -301,7 +301,7 @@ const todoWidgetConfig = {
   },
   maxSize: {
     width: 6,
-    height: 6
+    height: 4
   }
 };
 
