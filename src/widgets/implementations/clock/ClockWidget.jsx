@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import BaseWidget from '../../core/BaseWidget';
+import ClockSettings from './ClockSettings';
 import './ClockWidget.css';
 
-const ClockWidget = ({ id, onClose, onMinimize, settings = {} }) => {
+const ClockWidget = ({ id, onClose, onMinimize, settings = {}, onSettingsChange }) => {
   const [time, setTime] = useState(new Date());
-  const [is24Hour, setIs24Hour] = useState(settings.is24Hour ?? false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -16,24 +16,44 @@ const ClockWidget = ({ id, onClose, onMinimize, settings = {} }) => {
   }, []);
 
   const formatTime = (date) => {
-    if (is24Hour) {
-      return date.toLocaleTimeString('en-US', { 
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-    }
-    
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
+    const options = {
+      hour: settings.is24Hour ? '2-digit' : 'numeric',
       minute: '2-digit',
-      second: '2-digit'
-    });
+      hour12: !settings.is24Hour,
+      ...(settings.showSeconds !== false && { second: '2-digit' })
+    };
+    
+    return date.toLocaleTimeString('en-US', options);
   };
 
-  const toggleTimeFormat = () => {
-    setIs24Hour(!is24Hour);
+  const formatDate = (date) => {
+    if (settings.showDate === false) return null;
+
+    const options = {};
+    
+    if (settings.weekdayFormat && settings.weekdayFormat !== 'none') {
+      options.weekday = settings.weekdayFormat;
+    }
+    
+    if (settings.monthFormat) {
+      options.month = settings.monthFormat;
+    }
+    
+    if (settings.yearFormat && settings.yearFormat !== 'none') {
+      options.year = settings.yearFormat;
+    }
+
+    if (settings.monthFormat) {
+      options.day = '2-digit';
+    }
+
+    return date.toLocaleDateString('en-US', options);
+  };
+
+  const handleSettingsChange = (newSettings) => {
+    if (onSettingsChange) {
+      onSettingsChange(newSettings);
+    }
   };
 
   return (
@@ -43,21 +63,15 @@ const ClockWidget = ({ id, onClose, onMinimize, settings = {} }) => {
       onClose={onClose}
       onMinimize={onMinimize}
       settings={settings}
+      onSettingsChange={handleSettingsChange}
+      SettingsComponent={ClockSettings}
       className="clock-widget"
     >
       <div className="clock-container">
         <div className="clock-time">{formatTime(time)}</div>
-        <div className="clock-date">
-          {time.toLocaleDateString('en-US', { 
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        </div>
-        <button className="clock-format-toggle" onClick={toggleTimeFormat}>
-          {is24Hour ? '12H' : '24H'}
-        </button>
+        {settings.showDate !== false && (
+          <div className="clock-date">{formatDate(time)}</div>
+        )}
       </div>
     </BaseWidget>
   );
@@ -67,7 +81,8 @@ ClockWidget.propTypes = {
   id: PropTypes.string.isRequired,
   onClose: PropTypes.func,
   onMinimize: PropTypes.func,
-  settings: PropTypes.object
+  settings: PropTypes.object,
+  onSettingsChange: PropTypes.func
 };
 
 // Register the widget
@@ -75,9 +90,14 @@ const clockWidgetConfig = {
   type: 'clock',
   component: ClockWidget,
   name: 'Clock',
-  description: 'A digital clock widget with 12/24-hour format toggle',
+  description: 'A digital clock widget with customizable time and date formats',
   defaultSettings: {
     is24Hour: false,
+    showSeconds: true,
+    showDate: true,
+    weekdayFormat: 'long',
+    monthFormat: 'long',
+    yearFormat: 'numeric',
     theme: {
       textColor: '#FFFFFF',
       backgroundColor: '#161616'

@@ -15,6 +15,10 @@ const WidgetContainer = ({ className }) => {
     updateWidget(widgetId, { isMinimized });
   };
 
+  const handleWidgetSettingsChange = (widgetId, newSettings) => {
+    updateWidget(widgetId, { settings: newSettings });
+  };
+
   return (
     <div className={`widget-container ${className || ''}`}>
       {widgets.map(widget => {
@@ -35,6 +39,7 @@ const WidgetContainer = ({ className }) => {
             <WidgetComponent
               id={widget.id}
               settings={widget.settings || widgetConfig.defaultSettings}
+              onSettingsChange={(newSettings) => handleWidgetSettingsChange(widget.id, newSettings)}
               onClose={() => handleWidgetClose(widget.id)}
               onMinimize={(isMinimized) => handleWidgetMinimize(widget.id, isMinimized)}
             />

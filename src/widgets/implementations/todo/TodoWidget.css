@@ -12,6 +12,7 @@
   flex-direction: column;
   height: 100%;
   gap: 16px;
+  padding: 16px;
 }
 
 .todo-form {
@@ -23,17 +24,16 @@
   flex: 1;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 8px 12px;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
-  transition: all 0.2s ease;
 }
 
 .todo-input:focus {
   outline: none;
+  border-color: var(--accent-color, rgba(255, 255, 255, 0.2));
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .todo-input::placeholder {
@@ -46,28 +46,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
+  background: var(--accent-color);
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  color: white;
   cursor: pointer;
   padding: 0;
-  border-radius: 4px;
   transition: all 0.2s ease;
 }
 
-.todo-add-button:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-}
-
 .todo-add-button:disabled {
-  opacity: 0.3;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .todo-add-button svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 }
 
 .todo-list {
@@ -76,6 +71,9 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding-right: 8px;
+  padding-bottom: 8px;
+  position: relative;
 }
 
 .todo-item {
@@ -84,56 +82,188 @@
   gap: 8px;
   padding: 8px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  user-select: none;
+  cursor: default;
+  transition: background 0.2s ease;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+/* Density styles */
+.todo-item.compact {
+  min-height: 36px;
+  padding: 4px 8px;
 }
 
 .todo-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.todo-checkbox {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+/* Style for dragging */
+.todo-item[data-rbd-dragging="true"] {
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Style the drag placeholder */
+[data-rbd-placeholder-context-id] {
+  transition: none !important;
+}
+
+/* Style the draggable clone */
+[data-rbd-drag-handle-dragging-over] {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Style the dragging item */
+[data-rbd-draggable-id] {
+  background: inherit;
+}
+
+/* Remove any transition from the placeholder */
+[data-rbd-placeholder-context-id] * {
+  display: none;
+}
+
+/* Ensure proper cursor states */
+[data-rbd-dragging-state-context-id] {
+  cursor: grabbing !important;
+}
+
+/* Add styles for the droppable area */
+[data-rbd-droppable-id="todos"] {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+[data-rbd-drag-handle-context-id] {
+  cursor: grab;
+}
+
+[data-rbd-drag-handle-context-id]:active {
+  cursor: grabbing;
+}
+
+.drag-handle {
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
-  cursor: pointer;
-  padding: 0;
-  color: #fff;
-  transition: all 0.2s ease;
+  cursor: grab;
+  color: rgba(255, 255, 255, 0.3);
+  opacity: 0.5;
 }
 
-.todo-checkbox:hover {
-  border-color: rgba(255, 255, 255, 0.5);
+.todo-item:hover .drag-handle {
+  opacity: 0.8;
 }
 
-.todo-checkbox svg {
+.drag-handle:hover {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle svg {
   width: 16px;
   height: 16px;
-  opacity: 0;
-  transform: scale(0.8);
+}
+
+.todo-item.dragging .drag-handle {
+  color: rgba(255, 255, 255, 0.5);
+  cursor: grabbing;
+  opacity: 1;
+}
+
+/* Checkbox styles */
+.todo-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   transition: all 0.2s ease;
+}
+
+.todo-checkbox.circle {
+  border-radius: 50%;
+}
+
+.todo-checkbox:not(.circle) {
+  border-radius: 4px;
 }
 
 .todo-item.completed .todo-checkbox {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: transparent;
+  background: var(--accent-color);
+  border-color: var(--accent-color);
 }
 
-.todo-item.completed .todo-checkbox svg {
+/* Completion styles */
+.todo-item .todo-text {
+  text-decoration: none;
   opacity: 1;
-  transform: scale(1);
+}
+
+.todo-item[data-completion-style="strikethrough"].completed .todo-text {
+  text-decoration: line-through;
+  opacity: 1;
+}
+
+.todo-item[data-completion-style="fade"].completed .todo-text {
+  text-decoration: none;
+  opacity: 0.4;
+}
+
+.todo-item[data-completion-style="both"].completed .todo-text {
+  text-decoration: line-through;
+  opacity: 0.4;
+}
+
+.todo-checkbox svg {
+  width: 14px;
+  height: 14px;
+  color: white;
 }
 
 .todo-text {
   flex: 1;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
+  cursor: text;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.todo-text:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.todo-text-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 8px;
   color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
-  transition: all 0.2s ease;
+  outline: none;
+}
+
+.todo-text-input:focus {
+  border-color: var(--accent-color, rgba(255, 255, 255, 0.2));
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .todo-item.completed .todo-text {
@@ -152,7 +282,6 @@
   color: rgba(255, 255, 255, 0.3);
   cursor: pointer;
   padding: 0;
-  border-radius: 4px;
   opacity: 0;
   transition: all 0.2s ease;
 }
@@ -162,18 +291,17 @@
 }
 
 .todo-delete:hover {
-  background-color: rgba(255, 59, 48, 0.2);
-  color: #ff3b30;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .todo-delete svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .todo-empty {
-  color: rgba(255, 255, 255, 0.4);
   text-align: center;
   padding: 32px 16px;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 14px;
 } 
