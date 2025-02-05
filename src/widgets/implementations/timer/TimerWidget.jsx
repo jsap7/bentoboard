@@ -40,7 +40,16 @@ const timerWidgetConfig = {
     inputMethod: InputMethods.SCROLL
   },
   defaultSize: {
-    width: 5,
+    width: 3,
+    height: 3
+  },
+  isResizable: true,
+  minSize: {
+    width: 2,
+    height: 2
+  },
+  maxSize: {
+    width: 6,
     height: 4
   }
 };

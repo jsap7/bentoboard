@@ -292,7 +292,16 @@ const todoWidgetConfig = {
   },
   defaultSize: {
     width: 3,
-    height: 4
+    height: 3
+  },
+  isResizable: true,
+  minSize: {
+    width: 3,
+    height: 2
+  },
+  maxSize: {
+    width: 6,
+    height: 6
   }
 };
 

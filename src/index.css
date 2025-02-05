@@ -35,6 +35,8 @@
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 html, body {
@@ -71,4 +73,48 @@ h1 {
 
 p {
   color: #34495e;
+}
+
+/* WebKit scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Hide scrollbar when not hovering for a cleaner look */
+.widget-content {
+  scrollbar-width: none;
+}
+
+.widget-content:hover {
+  scrollbar-width: thin;
+}
+
+.widget-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.widget-content:hover::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 } 

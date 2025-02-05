@@ -2,7 +2,7 @@
   background-color: #161616;
   border-radius: 0 0 12px 12px;
   height: 100%;
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
 }
@@ -13,70 +13,226 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  gap: 8px;
 }
 
+/* Base styles for all sizes */
 .timer-widget .timer-ring-container {
   flex: 1;
-  width: 100%;
-  max-width: 280px;
-  aspect-ratio: 1;
-  margin: 0 auto;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
 }
 
-.timer-widget .timer-display {
-  font-size: 42px;
-  font-weight: 300;
+.timer-widget .timer-ring {
+  width: 200px;
+  height: 200px;
+  position: absolute;
 }
 
-.timer-widget .timer-input {
+/* Only scale when both width AND height are 3 or more */
+.widget-wrapper[style*="span 3"][style*="span 3"] .timer-widget .timer-ring {
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure fixed size for smaller layouts */
+.widget-wrapper[style*="span 2"] .timer-widget .timer-ring,
+.widget-wrapper[style*="span 3"][style*="span 2"] .timer-widget .timer-ring {
+  width: 200px;
+  height: 200px;
+}
+
+.timer-widget .timer-display-container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
+  width: 100%;
+  text-align: center;
+  z-index: 1;
 }
 
-.timer-widget .timer-input input {
-  font-size: 42px;
+.timer-widget .timer-display {
+  font-size: clamp(16px, 4vw, 42px);
+  font-weight: 300;
+  line-height: 1.2;
 }
 
 .timer-widget .timer-controls {
-  position: relative;
-  bottom: 0;
-  margin-top: 16px;
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .timer-widget .timer-button {
-  min-width: 80px;
-  padding: 8px 16px;
+  min-width: min(60px, 25%);
+  padding: 6px 12px;
+  font-size: clamp(11px, 2.5vw, 14px);
+  border-radius: 16px;
+  background-color: var(--accent-color, #FF453A);
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
 }
 
+.timer-widget .timer-button.reset {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.timer-widget .timer-button:hover {
+  opacity: 0.9;
+}
+
+.timer-widget .timer-button:active {
+  transform: translateY(1px);
+}
+
+.timer-widget .timer-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 1x1 Layout */
+.widget-wrapper[style*="span 1"] .timer-widget .timer {
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.widget-wrapper[style*="span 1"] .timer-widget .timer-ring-container {
+  display: none;
+}
+
+.widget-wrapper[style*="span 1"] .timer-widget .timer-display-container {
+  position: static;
+  transform: none;
+}
+
+.widget-wrapper[style*="span 1"] .timer-widget .timer-display {
+  font-size: clamp(14px, 5vw, 24px);
+}
+
+.widget-wrapper[style*="span 1"] .timer-widget .timer-controls {
+  flex-direction: row;
+  gap: 4px;
+}
+
+.widget-wrapper[style*="span 1"] .timer-widget .timer-button {
+  min-width: min(40px, 40%);
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+/* 2x1 Layout */
+.widget-wrapper[style*="span 2"][style*="span 1"] .timer-widget .timer {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.widget-wrapper[style*="span 2"][style*="span 1"] .timer-widget .timer-ring-container {
+  display: none;
+}
+
+.widget-wrapper[style*="span 2"][style*="span 1"] .timer-widget .timer-display-container {
+  position: static;
+  transform: none;
+  flex: 1;
+}
+
+.widget-wrapper[style*="span 2"][style*="span 1"] .timer-widget .timer-display {
+  font-size: clamp(16px, 4vw, 28px);
+}
+
+.widget-wrapper[style*="span 2"][style*="span 1"] .timer-widget .timer-controls {
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+/* 2x2 Layout */
+.widget-wrapper[style*="span 2"][style*="span 2"] .timer-widget .timer-display {
+  font-size: clamp(20px, 4.5vw, 32px);
+}
+
+.widget-wrapper[style*="span 2"][style*="span 2"] .timer-widget .timer-controls {
+  margin-top: auto;
+  padding-bottom: 8px;
+}
+
+.widget-wrapper[style*="span 2"][style*="span 2"] .timer-widget .timer-button {
+  min-width: min(50px, 25%);
+  padding: 6px 10px;
+}
+
+/* 3x2 Layout */
+.widget-wrapper[style*="span 3"][style*="span 2"] .timer-widget .timer-display {
+  font-size: clamp(24px, 4.5vw, 36px);
+}
+
+/* 3x3 and larger */
+.widget-wrapper[style*="span 3"][style*="span 3"] .timer-widget .timer,
+.widget-wrapper[style*="span 4"] .timer-widget .timer,
+.widget-wrapper[style*="span 5"] .timer-widget .timer,
+.widget-wrapper[style*="span 6"] .timer-widget .timer {
+  gap: 16px;
+}
+
+.widget-wrapper[style*="span 3"][style*="span 3"] .timer-widget .timer-display,
+.widget-wrapper[style*="span 4"] .timer-widget .timer-display,
+.widget-wrapper[style*="span 5"] .timer-widget .timer-display,
+.widget-wrapper[style*="span 6"] .timer-widget .timer-display {
+  font-size: clamp(28px, 5vw, 48px);
+}
+
+.widget-wrapper[style*="span 3"][style*="span 3"] .timer-widget .timer-button,
+.widget-wrapper[style*="span 4"] .timer-widget .timer-button,
+.widget-wrapper[style*="span 5"] .timer-widget .timer-button,
+.widget-wrapper[style*="span 6"] .timer-widget .timer-button {
+  min-width: 80px;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+/* Input methods */
+.timer-widget .timer-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.timer-widget .timer-input input {
+  width: clamp(40px, 30%, 80px);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: inherit;
+  font-weight: 300;
+  text-align: center;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Settings panel */
+.timer-widget .settings-panel {
+  max-height: calc(100% - 48px);
+  overflow-y: auto;
+}
+
+/* Settings button */
 .timer-widget .settings-button {
   position: absolute;
   top: 0;
   right: 0;
-}
-
-/* Ensure the timer ring fits nicely in the widget */
-.timer-widget .timer-ring {
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-}
-
-/* Adjust timer controls spacing */
-.timer-widget .timer-controls {
-  margin-top: 12px;
-  gap: 8px;
-}
-
-/* Make sure the settings panel doesn't overflow */
-.timer-widget .settings-panel {
-  max-height: calc(100% - 48px);
-  overflow-y: auto;
 } 

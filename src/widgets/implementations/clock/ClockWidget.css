@@ -1,4 +1,7 @@
 .clock-widget .widget-content {
+  background-color: #161616;
+  border-radius: 0 0 12px 12px;
+  height: 100%;
   padding: 16px;
 }
 
@@ -12,17 +15,19 @@
 }
 
 .clock-time {
-  font-size: 2.5em;
-  font-weight: 500;
+  font-size: clamp(24px, 5vw, 42px);
+  font-weight: 300;
   font-variant-numeric: tabular-nums;
   color: var(--widget-text-color, #FFFFFF);
   text-align: center;
+  line-height: 1.2;
 }
 
 .clock-date {
-  font-size: 0.9em;
+  font-size: clamp(14px, 2.5vw, 18px);
   color: var(--widget-text-color, rgba(255, 255, 255, 0.8));
   text-align: center;
+  line-height: 1.4;
 }
 
 .clock-format-toggle {
@@ -44,4 +49,70 @@
 
 .clock-format-toggle:active {
   transform: translateY(1px);
+}
+
+/* 1x1 Layout */
+.widget-wrapper[style*="span 1"] .clock-widget .clock-container {
+  gap: 4px;
+}
+
+.widget-wrapper[style*="span 1"] .clock-widget .clock-time {
+  font-size: clamp(18px, 4vw, 24px);
+}
+
+.widget-wrapper[style*="span 1"] .clock-widget .clock-date {
+  font-size: clamp(11px, 2vw, 14px);
+}
+
+/* 2x1 Layout */
+.widget-wrapper[style*="span 2"][style*="span 1"] .clock-widget .clock-container {
+  flex-direction: row;
+  gap: 12px;
+  padding: 0 8px;
+}
+
+.widget-wrapper[style*="span 2"][style*="span 1"] .clock-widget .clock-time {
+  font-size: clamp(20px, 4vw, 28px);
+  text-align: right;
+  flex: 1;
+}
+
+.widget-wrapper[style*="span 2"][style*="span 1"] .clock-widget .clock-date {
+  font-size: clamp(12px, 2.5vw, 16px);
+  text-align: left;
+  flex: 1;
+}
+
+/* 2x2 Layout */
+.widget-wrapper[style*="span 2"][style*="span 2"] .clock-widget .clock-time {
+  font-size: clamp(28px, 5vw, 36px);
+}
+
+.widget-wrapper[style*="span 2"][style*="span 2"] .clock-widget .clock-date {
+  font-size: clamp(14px, 2.5vw, 18px);
+}
+
+/* 3x2 Layout */
+.widget-wrapper[style*="span 3"][style*="span 2"] .clock-widget .clock-time {
+  font-size: clamp(32px, 5.5vw, 42px);
+}
+
+.widget-wrapper[style*="span 3"][style*="span 2"] .clock-widget .clock-date {
+  font-size: clamp(16px, 3vw, 20px);
+}
+
+/* 3x3 and larger */
+.widget-wrapper[style*="span 3"][style*="span 3"] .clock-widget .clock-time,
+.widget-wrapper[style*="span 4"] .clock-widget .clock-time,
+.widget-wrapper[style*="span 5"] .clock-widget .clock-time,
+.widget-wrapper[style*="span 6"] .clock-widget .clock-time {
+  font-size: clamp(42px, 6vw, 64px);
+}
+
+.widget-wrapper[style*="span 3"][style*="span 3"] .clock-widget .clock-date,
+.widget-wrapper[style*="span 4"] .clock-widget .clock-date,
+.widget-wrapper[style*="span 5"] .clock-widget .clock-date,
+.widget-wrapper[style*="span 6"] .clock-widget .clock-date {
+  font-size: clamp(18px, 3vw, 24px);
+  margin-top: 8px;
 } 

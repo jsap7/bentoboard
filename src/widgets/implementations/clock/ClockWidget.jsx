@@ -106,6 +106,15 @@ const clockWidgetConfig = {
   defaultSize: {
     width: 2,
     height: 2
+  },
+  isResizable: true,
+  minSize: {
+    width: 2,
+    height: 1
+  },
+  maxSize: {
+    width: 6,
+    height: 4
   }
 };
 

@@ -12,6 +12,7 @@ class WidgetRegistry {
    * @param {string} widgetConfig.description - Widget description
    * @param {Object} widgetConfig.defaultSettings - Default settings for the widget
    * @param {Object} widgetConfig.defaultSize - Default size for the widget
+   * @param {Object} widgetConfig.sizeConstraints - Size constraints for the widget
    */
   register(widgetConfig) {
     if (!widgetConfig.type || !widgetConfig.component) {
@@ -30,7 +31,8 @@ class WidgetRegistry {
     this.widgets.set(widgetConfig.type, {
       ...widgetConfig,
       defaultSettings: widgetConfig.defaultSettings || {},
-      defaultSize: widgetConfig.defaultSize || { width: 2, height: 2 }
+      defaultSize: widgetConfig.defaultSize || { width: 2, height: 2 },
+      sizeConstraints: widgetConfig.sizeConstraints || {}
     });
   }
 

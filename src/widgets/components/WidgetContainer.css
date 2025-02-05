@@ -1,18 +1,69 @@
 .widget-container {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: minmax(150px, auto);
+  grid-auto-rows: minmax(100px, 150px);
   gap: 16px;
   padding: 16px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   overflow: auto;
+  min-height: 100vh;
 }
 
 .widget-wrapper {
   position: relative;
   transition: all 0.3s ease;
+  background: var(--widget-bg);
+  border-radius: var(--border-radius-lg);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Ensure widget content fills the wrapper properly */
+.widget-wrapper > *:not(.resize-handle) {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.resize-handle svg {
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  transform: rotate(90deg);
+  transition: color 0.2s ease;
+}
+
+.widget-wrapper:hover .resize-handle {
+  opacity: 0.7;
+}
+
+.resize-handle:hover {
+  opacity: 1 !important;
+}
+
+.resize-handle:hover svg {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* Responsive adjustments */

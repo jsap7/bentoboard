@@ -199,7 +199,7 @@ const Timer = () => {
   };
 
   // Render methods
-  const renderTimerInput = () => {
+  const renderTimerDisplay = () => {
     if (settings.timerMode === TimerModes.ALARM) {
       if (isRunning) {
         return (
@@ -231,6 +231,19 @@ const Timer = () => {
       return (
         <div className={`timer-display ${isComplete ? 'timer-complete' : ''}`}>
           {formatTime(timeLeft)}
+        </div>
+      );
+    }
+
+    // Only show input methods in larger sizes
+    const container = document.querySelector('.widget-wrapper');
+    const isCompact = container?.classList.contains('compact') || 
+                     (container?.style.gridColumn === 'span 2' && container?.style.gridRow === 'span 1');
+    
+    if (isCompact) {
+      return (
+        <div className="timer-display">
+          {formatTime(selectedTime)}
         </div>
       );
     }
@@ -397,7 +410,7 @@ const Timer = () => {
           color={globalSettings.theme.ringColor}
         />
         <div className="timer-display-container">
-          {renderTimerInput()}
+          {renderTimerDisplay()}
         </div>
       </div>
       
@@ -406,7 +419,10 @@ const Timer = () => {
       </div>
 
       {showNotification && (
-        <div className={`timer-notification ${settings.timerMode === TimerModes.ALARM ? 'alarm' : ''}`} style={{ backgroundColor: globalSettings.theme.buttonColor }}>
+        <div 
+          className={`timer-notification ${settings.timerMode === TimerModes.ALARM ? 'alarm' : ''}`} 
+          style={{ backgroundColor: globalSettings.theme.buttonColor }}
+        >
           {settings.timerMode === TimerModes.ALARM ? 'Alarm!' : 'Timer Complete!'}
         </div>
       )}
