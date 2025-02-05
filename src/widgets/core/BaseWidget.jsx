@@ -16,36 +16,38 @@ const BaseWidget = ({
   onSettingsChange,
   SettingsComponent
 }) => {
-  const [isMinimized, setIsMinimized] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
-  const handleMinimize = () => {
-    setIsMinimized(!isMinimized);
-    if (onMinimize) {
-      onMinimize(!isMinimized);
-    }
+  const handleSettingsClick = () => {
+    setShowSettings(true);
   };
 
   const handleSettingsChange = (newSettings) => {
     if (onSettingsChange) {
-      onSettingsChange({
-        ...settings,
-        ...newSettings
-      });
+      onSettingsChange(newSettings);
+    }
+  };
+
+  const handleMinimize = () => {
+    const newState = !isMinimized;
+    setIsMinimized(newState);
+    if (onMinimize) {
+      onMinimize(newState);
     }
   };
 
   return (
     <>
-      <div className={`widget ${className || ''} ${isMinimized ? 'minimized' : ''}`}>
+      <div className={`widget ${className || ''} ${isMinimized ? 'minimized' : ''} ${showSettings ? 'settings-open' : ''}`}>
         <div className="widget-header">
           <div className="widget-title">{title}</div>
           <div className="widget-controls">
             {SettingsComponent && (
               <button 
                 className="widget-control settings"
-                onClick={() => setShowSettings(true)}
-                aria-label="Widget Settings"
+                onClick={handleSettingsClick}
+                aria-label="Settings"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
@@ -59,7 +61,15 @@ const BaseWidget = ({
                 onClick={handleMinimize}
                 aria-label={isMinimized ? 'Maximize' : 'Minimize'}
               >
-                {isMinimized ? '□' : '−'}
+                {isMinimized ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M8 3h8m-8 0v3m0-3H3m5 18h8m-8 0v-3m0 3H3m18-5h-3m3 0v-8m0 8v5m0-13h-3m3 0v-5M3 8v8m0-8h3m-3 8h3" />
+                  </svg>
+                )}
               </button>
             )}
             {onClose && (
@@ -68,7 +78,10 @@ const BaseWidget = ({
                 onClick={onClose}
                 aria-label="Close"
               >
-                ×
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             )}
           </div>

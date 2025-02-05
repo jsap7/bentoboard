@@ -31,17 +31,42 @@
   background-color: rgba(255, 255, 255, 0.05);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   user-select: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Show header on widget hover or when settings are open */
+.widget:hover .widget-header,
+.widget.settings-open .widget-header {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .widget-title {
   font-size: 14px;
   font-weight: 500;
   color: var(--widget-title-color, rgba(255, 255, 255, 0.9));
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 0.05s;
+}
+
+.widget:hover .widget-title,
+.widget.settings-open .widget-title {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .widget-controls {
   display: flex;
-  gap: 4px;
+  gap: 8px;
 }
 
 .widget-control {
@@ -49,24 +74,43 @@
   border: none;
   color: var(--widget-control-color, rgba(255, 255, 255, 0.6));
   cursor: pointer;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 16px;
   transition: all 0.2s ease;
+  opacity: 0;
+  transform: translateX(10px);
 }
 
+.widget:hover .widget-control,
+.widget.settings-open .widget-control {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Add transition delays for staggered animation */
+.widget-control:nth-child(1) { transition-delay: 0.1s; }
+.widget-control:nth-child(2) { transition-delay: 0.15s; }
+.widget-control:nth-child(3) { transition-delay: 0.2s; }
+
 .widget-control svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
 }
 
 .widget-control:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: var(--widget-control-hover-color, rgba(255, 255, 255, 0.9));
+}
+
+.widget-control.minimize {
+  font-size: 18px;
+  font-weight: 300;
 }
 
 .widget-control.close:hover {
@@ -83,4 +127,10 @@
   overflow: auto;
   padding: 16px;
   position: relative;
+  margin-top: 0;
+  transition: margin-top 0.2s ease;
+}
+
+.widget:hover .widget-content {
+  margin-top: 44px;
 } 
