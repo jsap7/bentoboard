@@ -1,0 +1,68 @@
+/* CSS Variables */
+:root {
+  /* Colors */
+  --notes-bg: #161616;
+  --notes-text: rgba(255, 255, 255, 0.9);
+  --notes-text-muted: rgba(255, 255, 255, 0.5);
+  --notes-border: rgba(255, 255, 255, 0.1);
+  --notes-focus-border: rgba(255, 255, 255, 0.2);
+  
+  /* Spacing */
+  --notes-padding: 16px;
+  --notes-border-radius: 12px;
+  
+  /* Transitions */
+  --notes-transition: all 0.2s ease;
+}
+
+/* Base Layout */
+.notes-widget .widget-content {
+  background-color: var(--notes-bg);
+  border-radius: 0 0 var(--notes-border-radius) var(--notes-border-radius);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--notes-padding);
+  gap: 8px;
+}
+
+/* Textarea Styles */
+.notes-textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--notes-border);
+  border-radius: calc(var(--notes-border-radius) - 4px);
+  padding: 12px;
+  color: var(--notes-text);
+  resize: none;
+  transition: var(--notes-transition);
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color, var(--notes-focus-border));
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notes-textarea::placeholder {
+  color: var(--notes-text-muted);
+}
+
+/* Status Bar */
+.notes-status {
+  font-size: 12px;
+  color: var(--notes-text-muted);
+  text-align: right;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: calc(var(--notes-border-radius) - 4px);
+  user-select: none;
+} 
