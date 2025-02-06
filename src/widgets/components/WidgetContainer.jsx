@@ -64,9 +64,10 @@ const WidgetContainer = ({ className }) => {
     const widget = widgets.find(w => w.id === widgetId);
     const startSize = widget?.size || widgetConfig.defaultSize;
     
-    // Get the container's actual width for accurate column calculation
+    // Get the container's actual width and height for accurate calculations
     const containerRect = e.currentTarget.closest('.widget-container').getBoundingClientRect();
-    const columnWidth = containerRect.width / 12;
+    const columnWidth = (containerRect.width - 176) / 12 + 16; // Account for gap and padding
+    const rowHeight = 136; // 120px + 16px gap
 
     const handleMouseMove = (moveEvent) => {
       const deltaX = moveEvent.clientX - startX;
@@ -74,7 +75,7 @@ const WidgetContainer = ({ className }) => {
       
       // Calculate new size in grid units
       const widthChange = Math.round(deltaX / columnWidth);
-      const heightChange = Math.round(deltaY / 100);
+      const heightChange = Math.round(deltaY / rowHeight);
 
       // Apply size constraints
       const minSize = widgetConfig.minSize || { width: 1, height: 1 };

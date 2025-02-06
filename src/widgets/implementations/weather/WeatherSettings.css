@@ -1,0 +1,209 @@
+/* CSS Variables */
+:root {
+  /* Colors */
+  --settings-bg: rgba(255, 255, 255, 0.06);
+  --settings-border: rgba(255, 255, 255, 0.1);
+  --settings-text-primary: rgba(255, 255, 255, 0.9);
+  --settings-text-secondary: rgba(255, 255, 255, 0.7);
+  --settings-hover-bg: rgba(255, 255, 255, 0.08);
+  --settings-error: #ff6b6b;
+  
+  /* Spacing */
+  --settings-padding: 16px;
+  --settings-gap: 24px;
+  --settings-border-radius: 6px;
+  
+  /* Transitions */
+  --settings-transition: all 0.2s ease;
+}
+
+/* Base Layout */
+.weather-settings {
+  padding: var(--settings-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--settings-gap);
+}
+
+/* Section Styles */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--settings-gap) / 1.5);
+}
+
+.settings-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--settings-text-primary);
+  margin: 0;
+}
+
+/* Setting Items */
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.setting-item label {
+  font-size: 14px;
+  color: var(--settings-text-secondary);
+}
+
+/* Form Controls */
+.setting-item select,
+.location-input {
+  background: var(--settings-bg);
+  border: 1px solid var(--settings-border);
+  border-radius: var(--settings-border-radius);
+  padding: 6px 8px;
+  color: var(--settings-text-primary);
+  font-size: 14px;
+  min-width: 120px;
+  transition: var(--settings-transition);
+}
+
+.setting-item select:focus,
+.location-input:focus {
+  outline: none;
+  border-color: var(--accent-color, var(--settings-border));
+  background: var(--settings-hover-bg);
+}
+
+/* Checkbox Styles */
+.setting-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--settings-border);
+  background: var(--settings-bg);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: var(--settings-transition);
+}
+
+.setting-item input[type="checkbox"]:checked {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.setting-item input[type="checkbox"]:checked::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-2px, -2px);
+}
+
+/* Location Form */
+.location-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.location-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location-input {
+  width: 100%;
+  padding: 8px 12px;
+}
+
+.location-error {
+  color: var(--settings-error);
+  font-size: 12px;
+}
+
+/* Location Actions */
+.location-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.location-actions button {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--settings-border-radius);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--settings-transition);
+}
+
+.location-save {
+  background: var(--accent-color);
+  border: none;
+  color: white;
+}
+
+.location-save:hover {
+  opacity: 0.9;
+}
+
+.location-cancel {
+  background: var(--settings-bg);
+  border: 1px solid var(--settings-border);
+  color: var(--settings-text-primary);
+}
+
+.location-cancel:hover {
+  background: var(--settings-hover-bg);
+}
+
+/* Location Display */
+.location-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--settings-bg);
+  padding: 8px 12px;
+  border-radius: var(--settings-border-radius);
+}
+
+.location-display span {
+  color: var(--settings-text-primary);
+  font-size: 14px;
+}
+
+.location-edit {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: var(--settings-transition);
+}
+
+.location-edit:hover {
+  background: var(--settings-hover-bg);
+}
+
+/* Auto Location Button */
+.use-auto-location {
+  background: none;
+  border: 1px solid var(--settings-border);
+  color: var(--settings-text-primary);
+  padding: 8px;
+  border-radius: var(--settings-border-radius);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--settings-transition);
+}
+
+.use-auto-location:hover {
+  background: var(--settings-hover-bg);
+} 
