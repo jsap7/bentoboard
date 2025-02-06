@@ -4,6 +4,7 @@ import { clockWidgetConfig } from '../implementations/clock/ClockWidget';
 import { todoWidgetConfig } from '../implementations/todo/TodoWidget';
 import { weatherWidgetConfig } from '../implementations/weather/WeatherWidget';
 import { notesWidgetConfig } from '../implementations/notes/NotesWidget';
+import { calculatorWidgetConfig } from '../implementations/calculator/CalculatorWidget';
 
 export function initializeWidgets() {
   // Register the timer widget
@@ -20,6 +21,9 @@ export function initializeWidgets() {
 
   // Register the notes widget
   widgetRegistry.register(notesWidgetConfig);
+
+  // Register the calculator widget
+  widgetRegistry.register(calculatorWidgetConfig);
 
   // Future widgets will be registered here
 }

@@ -1,0 +1,111 @@
+/* CSS Variables */
+:root {
+  /* Colors */
+  --calc-settings-bg: rgba(255, 255, 255, 0.06);
+  --calc-settings-border: rgba(255, 255, 255, 0.1);
+  --calc-settings-text-primary: rgba(255, 255, 255, 0.9);
+  --calc-settings-text-secondary: rgba(255, 255, 255, 0.7);
+  --calc-settings-hover-bg: rgba(255, 255, 255, 0.08);
+  
+  /* Spacing */
+  --calc-settings-padding: 16px;
+  --calc-settings-gap: 24px;
+  --calc-settings-border-radius: 6px;
+  
+  /* Transitions */
+  --calc-settings-transition: all 0.2s ease;
+}
+
+/* Base Layout */
+.calculator-settings {
+  padding: var(--calc-settings-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--calc-settings-gap);
+}
+
+/* Section Styles */
+.calculator-settings .settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--calc-settings-gap) / 1.5);
+}
+
+.calculator-settings .settings-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--calc-settings-text-primary);
+  margin: 0;
+}
+
+/* Setting Items */
+.calculator-settings .setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.calculator-settings .setting-item label {
+  font-size: 14px;
+  color: var(--calc-settings-text-secondary);
+}
+
+/* Form Controls */
+.calculator-settings .setting-item select {
+  background: var(--calc-settings-bg);
+  border: 1px solid var(--calc-settings-border);
+  border-radius: var(--calc-settings-border-radius);
+  padding: 6px 8px;
+  color: var(--calc-settings-text-primary);
+  font-size: 14px;
+  min-width: 80px;
+  transition: var(--calc-settings-transition);
+}
+
+.calculator-settings .setting-item select:focus {
+  outline: none;
+  border-color: var(--accent-color, var(--calc-settings-border));
+  background: var(--calc-settings-hover-bg);
+}
+
+/* Checkbox Styles */
+.calculator-settings .setting-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid var(--calc-settings-border);
+  background: var(--calc-settings-bg);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: var(--calc-settings-transition);
+}
+
+.calculator-settings .setting-item input[type="checkbox"]:checked {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.calculator-settings .setting-item input[type="checkbox"]:checked::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-2px, -2px);
+}
+
+/* Hover States */
+.calculator-settings .setting-item:hover label {
+  color: var(--calc-settings-text-primary);
+}
+
+.calculator-settings .setting-item input[type="checkbox"]:hover {
+  border-color: var(--accent-color);
+} 
