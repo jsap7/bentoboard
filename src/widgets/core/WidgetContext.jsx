@@ -82,11 +82,12 @@ export function WidgetProvider({ children, initialWidgets = [] }) {
     const newWidget = {
       id: `${type}-${Date.now()}`,
       type,
-      settings: { ...widgetConfig.defaultSettings },
+      settings: widgetConfig.defaultSettings,
       size: { ...widgetConfig.defaultSize },
       position
     };
 
+    console.log('Adding new widget with settings:', newWidget.settings);
     setWidgets(currentWidgets => [...currentWidgets, newWidget]);
     return newWidget.id;
   }, [findNextPosition]);

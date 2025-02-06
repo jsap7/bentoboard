@@ -1,0 +1,203 @@
+:root {
+  --github-bg: var(--surface-2);
+  --github-text: var(--text-1);
+  --github-text-muted: var(--text-2);
+  --github-padding: 0.75rem;
+  --github-gap: 0.5rem;
+  --github-border-radius: 6px;
+  --github-transition: all 0.2s ease;
+  --accent-rgb: var(--accent-color-rgb, 255, 255, 255);
+}
+
+.github-stats {
+  padding: var(--github-padding);
+  color: var(--github-text);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--github-gap);
+}
+
+.github-stats.loading,
+.github-stats.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: var(--github-text-muted);
+}
+
+.github-stats.error {
+  flex-direction: column;
+  gap: var(--github-gap);
+}
+
+.retry-button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--github-border-radius);
+  border: 1px solid rgb(var(--accent-rgb));
+  background: transparent;
+  color: rgb(var(--accent-rgb));
+  cursor: pointer;
+  transition: var(--github-transition);
+}
+
+.retry-button:hover {
+  background: rgb(var(--accent-rgb));
+  color: white;
+}
+
+.repo-header {
+  display: flex;
+  align-items: center;
+  gap: var(--github-gap);
+  margin-bottom: 0.25rem;
+}
+
+.github-icon {
+  width: 24px;
+  height: 24px;
+  color: rgb(var(--accent-rgb));
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.repo-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.repo-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--github-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repo-fullname {
+  font-size: 0.75rem;
+  color: rgb(var(--accent-rgb));
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 0.35rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--github-border-radius);
+  transition: var(--github-transition);
+  border: 1px solid transparent;
+}
+
+.stat-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgb(var(--accent-rgb));
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: rgb(var(--accent-rgb));
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.15rem;
+}
+
+.stat-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--github-text);
+}
+
+.footer-stats {
+  font-size: 0.75rem;
+  color: var(--github-text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-stats .label {
+  color: rgb(var(--accent-rgb));
+  opacity: 0.9;
+  margin-right: 0.35rem;
+}
+
+.footer-stats .value {
+  color: var(--github-text);
+  font-weight: 500;
+}
+
+.repo-description {
+  color: var(--github-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.github-commits h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--github-text);
+}
+
+.commits-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--github-gap);
+}
+
+.commit-item {
+  padding: 0.75rem;
+  border-radius: var(--github-border-radius);
+  background: var(--github-bg);
+  border: 1px solid var(--github-border);
+  transition: var(--github-transition);
+}
+
+.commit-item:hover {
+  background: var(--github-hover);
+}
+
+.commit-message {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  color: var(--github-text);
+}
+
+.commit-author,
+.commit-date {
+  font-size: 0.8rem;
+  color: var(--github-text-muted);
+}
+
+.commit-author {
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 480px) {
+  .repo-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .meta-item {
+    justify-content: space-between;
+  }
+} 

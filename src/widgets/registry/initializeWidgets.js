@@ -5,6 +5,7 @@ import { todoWidgetConfig } from '../implementations/todo/TodoWidget';
 import { weatherWidgetConfig } from '../implementations/weather/WeatherWidget';
 import { notesWidgetConfig } from '../implementations/notes/NotesWidget';
 import { calculatorWidgetConfig } from '../implementations/calculator/CalculatorWidget';
+import { gitHubStatsWidgetConfig } from '../implementations/github-stats/GithubStatsWidget';
 
 export function initializeWidgets() {
   // Register the timer widget
@@ -24,6 +25,9 @@ export function initializeWidgets() {
 
   // Register the calculator widget
   widgetRegistry.register(calculatorWidgetConfig);
+
+  // Register the GitHub Stats widget
+  widgetRegistry.register(gitHubStatsWidgetConfig);
 
   // Future widgets will be registered here
 }

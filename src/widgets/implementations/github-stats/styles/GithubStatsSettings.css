@@ -1,0 +1,110 @@
+:root {
+  --github-settings-bg: var(--surface-2);
+  --github-settings-border: var(--surface-3);
+  --github-settings-text: var(--text-1);
+  --github-settings-text-muted: var(--text-2);
+  --github-settings-hover: var(--surface-3);
+  --github-settings-input-bg: var(--surface-1);
+  --github-settings-input-border: var(--surface-3);
+  --github-settings-padding: 1rem;
+  --github-settings-gap: 0.75rem;
+  --github-settings-border-radius: 6px;
+  --github-settings-transition: all 0.2s ease;
+}
+
+.github-stats-settings {
+  padding: var(--github-settings-padding);
+  color: var(--github-settings-text);
+}
+
+.settings-section {
+  margin-bottom: 1.5rem;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.settings-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--github-settings-text);
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  gap: var(--github-settings-gap);
+}
+
+.setting-item label {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--github-settings-text);
+  cursor: pointer;
+}
+
+.setting-item input[type="text"],
+.setting-item select {
+  flex: 2;
+  padding: 0.5rem;
+  border-radius: var(--github-settings-border-radius);
+  border: 1px solid var(--github-settings-input-border);
+  background: var(--github-settings-input-bg);
+  color: var(--github-settings-text);
+  font-size: 0.9rem;
+  transition: var(--github-settings-transition);
+}
+
+.setting-item input[type="text"]:hover,
+.setting-item select:hover {
+  border-color: var(--github-settings-hover);
+}
+
+.setting-item input[type="text"]:focus,
+.setting-item select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-alpha);
+}
+
+.setting-item input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 4px;
+  border: 1px solid var(--github-settings-input-border);
+  background: var(--github-settings-input-bg);
+  cursor: pointer;
+  transition: var(--github-settings-transition);
+}
+
+.setting-item input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.setting-item input[type="checkbox"]:hover {
+  border-color: var(--github-settings-hover);
+}
+
+.setting-item input[type="checkbox"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-alpha);
+}
+
+@media (max-width: 480px) {
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .setting-item input[type="text"],
+  .setting-item select {
+    width: 100%;
+  }
+} 
