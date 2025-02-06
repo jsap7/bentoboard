@@ -3,32 +3,41 @@ import PropTypes from 'prop-types';
 import BaseWidget from '../../core/BaseWidget';
 import TodoSettings from './TodoSettings';
 import { useGlobalSettings } from '../../../shared/context/GlobalSettingsContext';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import './TodoWidget.css';
-
-// StrictModeDroppable component to handle React 18 Strict Mode
-const StrictModeDroppable = ({ children, ...props }) => {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    const animation = requestAnimationFrame(() => setEnabled(true));
-    return () => {
-      cancelAnimationFrame(animation);
-      setEnabled(false);
-    };
-  }, []);
-
-  if (!enabled) {
-    return null;
-  }
-
-  return <Droppable {...props}>{children}</Droppable>;
-};
 
 const TodoItem = React.memo(({ todo, index, onToggle, onDelete, onEdit, globalSettings, settings = {} }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
   const inputRef = useRef(null);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: todo.id });
+
+  const style = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    transition,
+  };
 
   useEffect(() => {
     if (isEditing) {
@@ -42,7 +51,7 @@ const TodoItem = React.memo(({ todo, index, onToggle, onDelete, onEdit, globalSe
     if (trimmedText && trimmedText !== todo.text) {
       onEdit(todo.id, trimmedText);
     } else {
-      setEditText(todo.text); // Reset if empty or unchanged
+      setEditText(todo.text);
     }
     setIsEditing(false);
   };
@@ -61,68 +70,63 @@ const TodoItem = React.memo(({ todo, index, onToggle, onDelete, onEdit, globalSe
   };
 
   return (
-    <Draggable draggableId={String(todo.id)} index={index}>
-      {(provided, snapshot) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          className={`todo-item ${todo.completed ? 'completed' : ''} ${settings.density === 'compact' ? 'compact' : ''}`}
-          data-rbd-dragging={snapshot.isDragging}
-          data-completion-style={settings.completionStyle || 'strikethrough'}
-        >
-          {settings.showDragHandles !== false && (
-            <div className="drag-handle">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="8" y1="6" x2="16" y2="6" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-                <line x1="8" y1="18" x2="16" y2="18" />
-              </svg>
-            </div>
-          )}
-          <button 
-            className={`todo-checkbox ${settings.checkboxStyle === 'circle' ? 'circle' : ''}`}
-            onClick={() => onToggle(todo.id)}
-            aria-label={todo.completed ? "Mark incomplete" : "Mark complete"}
-            style={{ '--accent-color': globalSettings.theme.buttonColor }}
-          >
-            {todo.completed && (
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            )}
-          </button>
-          {isEditing ? (
-            <input
-              ref={inputRef}
-              type="text"
-              className="todo-text-input"
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-            />
-          ) : (
-            <span 
-              className="todo-text"
-              onClick={() => setIsEditing(true)}
-            >
-              {todo.text}
-            </span>
-          )}
-          <button 
-            className="todo-delete" 
-            onClick={() => onDelete(todo.id)}
-            aria-label="Delete task"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`todo-item ${todo.completed ? 'completed' : ''} ${settings.density === 'compact' ? 'compact' : ''} ${isDragging ? 'dragging' : ''}`}
+      data-completion-style={settings.completionStyle || 'strikethrough'}
+    >
+      {settings.showDragHandles !== false && (
+        <div className="drag-handle" {...listeners}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="8" y1="6" x2="16" y2="6" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+            <line x1="8" y1="18" x2="16" y2="18" />
+          </svg>
         </div>
       )}
-    </Draggable>
+      <button 
+        className={`todo-checkbox ${settings.checkboxStyle === 'circle' ? 'circle' : ''}`}
+        onClick={() => onToggle(todo.id)}
+        aria-label={todo.completed ? "Mark incomplete" : "Mark complete"}
+        style={{ '--accent-color': globalSettings.theme.buttonColor }}
+      >
+        {todo.completed && (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
+      </button>
+      {isEditing ? (
+        <input
+          ref={inputRef}
+          type="text"
+          className="todo-text-input"
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+        />
+      ) : (
+        <span 
+          className="todo-text"
+          onClick={() => setIsEditing(true)}
+        >
+          {todo.text}
+        </span>
+      )}
+      <button 
+        className="todo-delete" 
+        onClick={() => onDelete(todo.id)}
+        aria-label="Delete task"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
   );
 });
 
@@ -133,6 +137,13 @@ const TodoWidget = ({ id, onClose, onMinimize, settings = {}, onSettingsChange }
     return saved ? JSON.parse(saved) : [];
   });
   const [newTodo, setNewTodo] = useState('');
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     localStorage.setItem(`todo_widget_${id}`, JSON.stringify(todos));
@@ -167,22 +178,27 @@ const TodoWidget = ({ id, onClose, onMinimize, settings = {}, onSettingsChange }
     ));
   }, []);
 
-  const handleDragEnd = useCallback((result) => {
-    if (!result.destination) return;
+  const handleDragEnd = useCallback((event) => {
+    const { active, over } = event;
+    
+    if (active.id !== over?.id) {
+      setTodos((items) => {
+        const oldIndex = items.findIndex(item => item.id === active.id);
+        const newIndex = items.findIndex(item => item.id === over.id);
 
-    const items = Array.from(todos);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+        const newItems = arrayMove(items, oldIndex, newIndex);
 
-    // If we're using bottom sorting, we need to maintain the order
-    if (settings.completedItemsPosition === 'bottom') {
-      const incomplete = items.filter(todo => !todo.completed);
-      const complete = items.filter(todo => todo.completed);
-      setTodos([...incomplete, ...complete]);
-    } else {
-      setTodos(items);
+        // If we're using bottom sorting, we need to maintain the order
+        if (settings.completedItemsPosition === 'bottom') {
+          const incomplete = newItems.filter(todo => !todo.completed);
+          const complete = newItems.filter(todo => todo.completed);
+          return [...incomplete, ...complete];
+        }
+        
+        return newItems;
+      });
     }
-  }, [todos, settings.completedItemsPosition]);
+  }, [settings.completedItemsPosition]);
 
   const handleSettingsChange = (newSettings) => {
     if (onSettingsChange) {
@@ -211,57 +227,56 @@ const TodoWidget = ({ id, onClose, onMinimize, settings = {}, onSettingsChange }
       SettingsComponent={TodoSettings}
       className="todo-widget"
     >
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="todo-container">
-          <form onSubmit={handleAddTodo} className="todo-form">
-            <input
-              type="text"
-              value={newTodo}
-              onChange={(e) => setNewTodo(e.target.value)}
-              placeholder="Add a new task..."
-              className="todo-input"
-            />
-            <button 
-              type="submit" 
-              className="todo-add-button" 
-              disabled={!newTodo.trim()}
-              style={{ '--accent-color': globalSettings.theme.buttonColor }}
+      <div className="todo-container">
+        <form onSubmit={handleAddTodo} className="todo-form">
+          <input
+            type="text"
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+            placeholder="Add a new task..."
+            className="todo-input"
+          />
+          <button 
+            type="submit" 
+            className="todo-add-button" 
+            disabled={!newTodo.trim()}
+            style={{ '--accent-color': globalSettings.theme.buttonColor }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+        </form>
+        <div className="todo-list">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={sortedTodos.map(t => t.id)}
+              strategy={verticalListSortingStrategy}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-            </button>
-          </form>
-          <div className="todo-list">
-            <StrictModeDroppable droppableId="todos">
-              {(provided, snapshot) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                >
-                  {sortedTodos.map((todo, index) => (
-                    <TodoItem
-                      key={todo.id}
-                      todo={todo}
-                      index={index}
-                      onToggle={toggleTodo}
-                      onDelete={deleteTodo}
-                      onEdit={editTodo}
-                      globalSettings={globalSettings}
-                      settings={settings}
-                    />
-                  ))}
-                  {provided.placeholder}
-                  {todos.length === 0 && (
-                    <div className="todo-empty">No tasks yet. Add one above!</div>
-                  )}
-                </div>
+              {sortedTodos.map((todo, index) => (
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  index={index}
+                  onToggle={toggleTodo}
+                  onDelete={deleteTodo}
+                  onEdit={editTodo}
+                  globalSettings={globalSettings}
+                  settings={settings}
+                />
+              ))}
+              {todos.length === 0 && (
+                <div className="todo-empty">No tasks yet. Add one above!</div>
               )}
-            </StrictModeDroppable>
-          </div>
+            </SortableContext>
+          </DndContext>
         </div>
-      </DragDropContext>
+      </div>
     </BaseWidget>
   );
 };

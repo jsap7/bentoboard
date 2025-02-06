@@ -85,9 +85,10 @@
   border-radius: 8px;
   user-select: none;
   cursor: default;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
   min-height: 44px;
   box-sizing: border-box;
+  touch-action: none;
 }
 
 /* Density styles */
@@ -101,50 +102,11 @@
 }
 
 /* Style for dragging */
-.todo-item[data-rbd-dragging="true"] {
+.todo-item.dragging {
   background: rgba(255, 255, 255, 0.12) !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* Style the drag placeholder */
-[data-rbd-placeholder-context-id] {
-  transition: none !important;
-}
-
-/* Style the draggable clone */
-[data-rbd-drag-handle-dragging-over] {
-  background: rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Style the dragging item */
-[data-rbd-draggable-id] {
-  background: inherit;
-}
-
-/* Remove any transition from the placeholder */
-[data-rbd-placeholder-context-id] * {
-  display: none;
-}
-
-/* Ensure proper cursor states */
-[data-rbd-dragging-state-context-id] {
+  opacity: 0.8;
   cursor: grabbing !important;
-}
-
-/* Add styles for the droppable area */
-[data-rbd-droppable-id="todos"] {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-[data-rbd-drag-handle-context-id] {
-  cursor: grab;
-}
-
-[data-rbd-drag-handle-context-id]:active {
-  cursor: grabbing;
 }
 
 .drag-handle {
@@ -156,6 +118,7 @@
   cursor: grab;
   color: rgba(255, 255, 255, 0.3);
   opacity: 0.5;
+  touch-action: none;
 }
 
 .todo-item:hover .drag-handle {
