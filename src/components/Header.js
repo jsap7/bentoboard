@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useGlobalContext } from '../context/GlobalContext';
+import React, { useState, useEffect } from 'react';
+import { useGlobalContext, availableFonts } from '../context/GlobalContext';
 import { listWidgets } from '../registry/widgetRegistry';
+import { FiSettings, FiPlus, FiX } from 'react-icons/fi';
 import './Header.css';
 
 const Header = ({ onAddWidget }) => {
@@ -9,6 +10,30 @@ const Header = ({ onAddWidget }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const widgets = listWidgets();
 
+  // Load font on mount and when font changes
+  useEffect(() => {
+    if (theme?.font?.family) {
+      const selectedFont = availableFonts.find(f => f.family === theme.font.family);
+      if (selectedFont) {
+        // Remove any existing font link
+        const existingLink = document.head.querySelector('link[data-font-link]');
+        if (existingLink) {
+          existingLink.remove();
+        }
+        
+        // Add new font link
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = selectedFont.url;
+        link.setAttribute('data-font-link', '');
+        document.head.appendChild(link);
+
+        // Update CSS variable for global font
+        document.documentElement.style.setProperty('--font-primary', `'${selectedFont.family}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif`);
+      }
+    }
+  }, [theme?.font?.family]);
+
   const handleAccentColorChange = (color) => {
     setTheme(prev => ({
       ...prev,
@@ -16,8 +41,21 @@ const Header = ({ onAddWidget }) => {
     }));
   };
 
+  const handleFontChange = (fontFamily) => {
+    const selectedFont = availableFonts.find(f => f.family === fontFamily);
+    if (selectedFont) {
+      setTheme(prev => ({
+        ...prev,
+        font: {
+          ...prev.font,
+          family: fontFamily
+        }
+      }));
+    }
+  };
+
   return (
-    <header className="dashboard-header" style={{ backgroundColor: theme.header }}>
+    <header className="dashboard-header" style={{ backgroundColor: theme?.header }}>
       <div className="header-content">
         <div className="header-left">
           <div className="widget-dropdown-container">
@@ -26,10 +64,7 @@ const Header = ({ onAddWidget }) => {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               aria-label="Add Widget"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
+              <FiPlus />
             </button>
             
             {isDropdownOpen && (
@@ -45,10 +80,7 @@ const Header = ({ onAddWidget }) => {
                       className="close-dropdown"
                       onClick={() => setIsDropdownOpen(false)}
                     >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
+                      <FiX />
                     </button>
                   </div>
                   <div className="widget-list">
@@ -70,11 +102,6 @@ const Header = ({ onAddWidget }) => {
                           </div>
                           <p>{config.description}</p>
                         </div>
-                        <div className="widget-option-arrow">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                          </svg>
-                        </div>
                       </button>
                     ))}
                   </div>
@@ -91,10 +118,7 @@ const Header = ({ onAddWidget }) => {
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
               aria-label="Settings"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
-              </svg>
+              <FiSettings />
             </button>
 
             {isSettingsOpen && (
@@ -110,22 +134,35 @@ const Header = ({ onAddWidget }) => {
                       className="close-dropdown"
                       onClick={() => setIsSettingsOpen(false)}
                     >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
+                      <FiX />
                     </button>
                   </div>
                   <div className="settings-content">
                     <div className="settings-section">
                       <h3>Theme</h3>
                       <div className="settings-option">
+                        <label>Font Family</label>
+                        <div className="font-options">
+                          {availableFonts.map((font) => (
+                            <button
+                              key={font.family}
+                              className={`font-option ${theme?.font?.family === font.family ? 'active' : ''}`}
+                              onClick={() => handleFontChange(font.family)}
+                              style={{ fontFamily: font.family }}
+                            >
+                              <span className="font-name">{font.family}</span>
+                              <span className="font-preview">The quick brown fox</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="settings-option">
                         <label>Accent Color</label>
                         <div className="color-options">
                           {['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#84cc16', '#06b6d4'].map(color => (
                             <button
                               key={color}
-                              className={`color-option ${theme.accentColor === color ? 'active' : ''}`}
+                              className={`color-option ${theme?.accentColor === color ? 'active' : ''}`}
                               style={{ backgroundColor: color }}
                               onClick={() => handleAccentColorChange(color)}
                               aria-label={`Set accent color to ${color}`}
