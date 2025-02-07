@@ -2,7 +2,7 @@
 
 A modern, customizable personal dashboard with a beautiful dark UI and widget support. BentoBoard provides a flexible grid-based layout where you can add, resize, and customize various widgets to create your perfect dashboard.
 
-![BentoBoard Screenshot](screenshot.png)
+![BentoBoard Screenshot](BentoBoard.jpeg)
 
 ## ✨ Features
 
