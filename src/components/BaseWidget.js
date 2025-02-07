@@ -3,8 +3,11 @@ import { useGlobalContext } from '../context/GlobalContext';
 import SettingsPortal from './SettingsPortal';
 import './BaseWidget.css';
 
-const DragHandle = () => (
-  <div className="widget-drag-handle">
+const DragHandle = ({ onDragStart }) => (
+  <div 
+    className="widget-drag-handle"
+    onMouseDown={onDragStart}
+  >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M8 9h8M8 15h8" />
     </svg>
@@ -29,6 +32,7 @@ const BaseWidget = ({
   style,
   onClose,
   onResize,
+  onDrag,
   settings = {},
   onSettingsChange,
   SettingsComponent,
@@ -39,11 +43,114 @@ const BaseWidget = ({
   const { theme } = useGlobalContext();
   const [showSettings, setShowSettings] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [currentGridSize, setCurrentGridSize] = useState(gridSize);
+  const [currentGridPosition, setCurrentGridPosition] = useState(gridPosition);
 
   useEffect(() => {
-    setCurrentGridSize(gridSize);
+    if (JSON.stringify(gridSize) !== JSON.stringify(currentGridSize)) {
+      setCurrentGridSize(gridSize);
+    }
   }, [gridSize]);
+
+  useEffect(() => {
+    if (JSON.stringify(gridPosition) !== JSON.stringify(currentGridPosition)) {
+      setCurrentGridPosition(gridPosition);
+    }
+  }, [gridPosition]);
+
+  const handleDragStart = useCallback((e) => {
+    console.log('Drag start');
+    const widgetElement = e.currentTarget.closest('.widget');
+    if (!widgetElement) {
+      console.warn('Widget element not found');
+      return;
+    }
+
+    const dashboardElement = document.querySelector('.dashboard');
+    if (!dashboardElement) {
+      console.warn('Dashboard element not found');
+      return;
+    }
+
+    const widgetRect = widgetElement.getBoundingClientRect();
+    const dashboardRect = dashboardElement.getBoundingClientRect();
+
+    // Calculate the offset of the mouse click relative to the widget
+    const offsetX = e.clientX - widgetRect.left;
+    const offsetY = e.clientY - widgetRect.top;
+
+    console.log('Initial offsets:', { offsetX, offsetY });
+    console.log('Widget rect:', widgetRect);
+    console.log('Dashboard rect:', dashboardRect);
+    
+    setIsDragging(true);
+    widgetElement.style.transition = 'none';
+    widgetElement.style.zIndex = '1000';
+    widgetElement.classList.add('dragging');
+
+    const handleMouseMove = (e) => {
+      if (!onDrag) {
+        console.warn('No onDrag handler provided');
+        return;
+      }
+
+      // Calculate new position relative to the dashboard
+      const mouseX = e.clientX - dashboardRect.left;
+      const mouseY = e.clientY - dashboardRect.top;
+
+      console.log('Mouse move:', { 
+        clientX: e.clientX, 
+        clientY: e.clientY,
+        mouseX, 
+        mouseY, 
+        offsetX, 
+        offsetY 
+      });
+
+      const adjustedX = mouseX - offsetX;
+      const adjustedY = mouseY - offsetY;
+
+      console.log('Adjusted position:', { adjustedX, adjustedY });
+
+      const dragData = {
+        mouseX: adjustedX,
+        mouseY: adjustedY,
+        startPosition: currentGridPosition,
+        size: currentGridSize,
+        widgetRect,
+        dashboardRect
+      };
+
+      const newPosition = onDrag(dragData);
+      console.log('Drag handler returned:', newPosition);
+      
+      if (newPosition && newPosition.column !== undefined && newPosition.row !== undefined) {
+        console.log('Setting new position:', newPosition);
+        setCurrentGridPosition(newPosition);
+      }
+    };
+
+    const handleMouseUp = () => {
+      console.log('Drag end');
+      setIsDragging(false);
+      widgetElement.style.transition = '';
+      widgetElement.style.zIndex = '';
+      widgetElement.classList.remove('dragging');
+      
+      // Clean up event listeners
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    // Add the event listeners
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    // Prevent default browser drag behavior
+    e.preventDefault();
+    e.stopPropagation();
+  }, [onDrag, currentGridPosition, currentGridSize]);
 
   const handleResizeStart = useCallback((e, position) => {
     e.preventDefault();
@@ -57,7 +164,6 @@ const BaseWidget = ({
 
     const handleMouseMove = (e) => {
       if (onResize) {
-        // Calculate resize direction based on handle position
         const direction = {
           isLeft: position.includes('w'),
           isTop: position.includes('n'),
@@ -65,18 +171,11 @@ const BaseWidget = ({
           isBottom: position.includes('s')
         };
         
-        // Calculate the new position and size based on resize direction
         const resizeData = {
           mouseX: e.clientX,
           mouseY: e.clientY,
-          startPosition: {
-            column: gridPosition.column || 0,
-            row: gridPosition.row || 0
-          },
-          startSize: {
-            width: currentGridSize.width || 1,
-            height: currentGridSize.height || 1
-          },
+          startPosition: currentGridPosition,
+          startSize: currentGridSize,
           direction,
           widgetRect
         };
@@ -96,13 +195,13 @@ const BaseWidget = ({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [onResize, gridPosition, currentGridSize]);
+  }, [onResize, currentGridPosition, currentGridSize]);
 
   const widgetStyle = {
     ...style,
     backgroundColor: theme.surface,
     color: theme.text,
-    cursor: isResizing ? 'nwse-resize' : 'default'
+    cursor: isDragging ? 'grabbing' : isResizing ? 'nwse-resize' : 'default'
   };
 
   const handleSettingsClick = () => {
@@ -116,13 +215,13 @@ const BaseWidget = ({
   return (
     <>
       <div 
-        className={`widget ${isResizing ? 'resizing' : ''}`} 
+        className={`widget ${isResizing ? 'resizing' : ''} ${isDragging ? 'dragging' : ''}`} 
         style={widgetStyle} 
         data-widget-id={id}
       >
         <div className="widget-header">
           <div className="widget-header-left">
-            <DragHandle />
+            <DragHandle onDragStart={handleDragStart} />
             <div className="widget-title">{title}</div>
           </div>
           <div className="widget-controls">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import BaseWidget from '../components/BaseWidget';
 
 // Clock Settings Component
@@ -49,24 +49,46 @@ const ClockSettings = ({ settings, onSettingsChange, onClose }) => {
   );
 };
 
-const ClockWidget = ({ style, onResize }) => {
+const ClockWidget = ({ 
+  id,
+  style, 
+  onResize,
+  onDrag,
+  onClose,
+  gridPosition,
+  gridSize
+}) => {
   const [time, setTime] = useState(new Date());
   const [settings, setSettings] = useState({
     showSeconds: true,
     showDate: true
   });
 
+  // Memoize time update interval
   useEffect(() => {
-    const timer = setInterval(() => {
+    const updateTime = () => {
       setTime(new Date());
-    }, 1000);
+    };
+    
+    // Initial update
+    updateTime();
+    
+    // Set interval for updates
+    const timer = setInterval(updateTime, settings.showSeconds ? 1000 : 60000);
 
     return () => clearInterval(timer);
+  }, [settings.showSeconds]); // Only recreate interval when showSeconds changes
+
+  const handleSettingsChange = useCallback((newSettings) => {
+    setSettings(newSettings);
   }, []);
 
-  const handleSettingsChange = (newSettings) => {
-    setSettings(newSettings);
-  };
+  // Memoize time formatting options
+  const timeOptions = useMemo(() => ({
+    hour: '2-digit',
+    minute: '2-digit',
+    ...(settings.showSeconds && { second: '2-digit' })
+  }), [settings.showSeconds]);
 
   const contentStyle = {
     display: 'flex',
@@ -88,20 +110,18 @@ const ClockWidget = ({ style, onResize }) => {
     opacity: 0.8
   };
 
-  const timeOptions = {
-    hour: '2-digit',
-    minute: '2-digit',
-    ...(settings.showSeconds && { second: '2-digit' })
-  };
-
   return (
     <BaseWidget
-      id="clock"
+      id={id}
       title="Clock"
       style={style}
       settings={settings}
       onSettingsChange={handleSettingsChange}
       onResize={onResize}
+      onDrag={onDrag}
+      onClose={onClose}
+      gridPosition={gridPosition}
+      gridSize={gridSize}
       SettingsComponent={ClockSettings}
     >
       <div style={contentStyle}>

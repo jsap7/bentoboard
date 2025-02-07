@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useGlobalContext } from '../context/GlobalContext';
-import { getCellDimensions } from '../utils/gridManager';
+import { getCellDimensions, snapToGrid } from '../utils/gridManager';
 
-const Dashboard = ({ children, onWidgetResize }) => {
+const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
   const { theme, dashboardState } = useGlobalContext();
   const dashboardRef = useRef(null);
   const [dynamicRowHeight, setDynamicRowHeight] = useState(dashboardState.layout.rowHeight);
@@ -29,25 +29,98 @@ const Dashboard = ({ children, onWidgetResize }) => {
 
   // Convert pixel coordinates to grid coordinates
   const pixelsToGrid = useCallback((x, y) => {
-    if (!dashboardRef.current) return { column: 0, row: 0 };
+    if (!dashboardRef.current) {
+      console.warn('Dashboard ref not available');
+      return { column: 0, row: 0 };
+    }
 
     const rect = dashboardRef.current.getBoundingClientRect();
     const containerWidth = rect.width - (dashboardState.layout.gap * 2);
-    const cellWidth = containerWidth / dashboardState.layout.columns;
-    const cellHeight = dynamicRowHeight;
+    const containerHeight = rect.height - (dashboardState.layout.gap * 2);
+    
+    // Calculate cell dimensions including gaps
+    const totalGapWidth = dashboardState.layout.gap * (dashboardState.layout.columns - 1);
+    const totalGapHeight = dashboardState.layout.gap * (dashboardState.layout.rows - 1);
+    
+    const cellWidth = (containerWidth - totalGapWidth) / dashboardState.layout.columns;
+    const cellHeight = (containerHeight - totalGapHeight) / dashboardState.layout.rows;
 
-    const column = Math.max(0, Math.min(
-      dashboardState.layout.columns - 1,
-      Math.floor(x / (cellWidth + dashboardState.layout.gap))
-    ));
+    // Calculate grid position
+    const column = Math.floor(x / (cellWidth + dashboardState.layout.gap));
+    const row = Math.floor(y / (cellHeight + dashboardState.layout.gap));
 
-    const row = Math.max(0, Math.min(
-      dashboardState.layout.rows - 1,
-      Math.floor(y / (cellHeight + dashboardState.layout.gap))
-    ));
+    console.log('Grid calculation:', { 
+      input: { x, y },
+      dimensions: { containerWidth, containerHeight, cellWidth, cellHeight },
+      gaps: { totalGapWidth, totalGapHeight },
+      result: { column, row }
+    });
 
-    return { column, row };
-  }, [dashboardState.layout, dynamicRowHeight]);
+    // Ensure position is within bounds
+    const boundedColumn = Math.max(0, Math.min(dashboardState.layout.columns - 1, column));
+    const boundedRow = Math.max(0, Math.min(dashboardState.layout.rows - 1, row));
+
+    if (boundedColumn !== column || boundedRow !== row) {
+      console.log('Position bounded:', { 
+        from: { column, row }, 
+        to: { column: boundedColumn, row: boundedRow } 
+      });
+    }
+
+    return {
+      column: boundedColumn,
+      row: boundedRow
+    };
+  }, [dashboardState.layout]);
+
+  // Handle widget drag
+  const handleWidgetDrag = useCallback((widgetId, dragData) => {
+    if (!dashboardRef.current || !dragData) {
+      console.warn('Missing dashboard ref or drag data');
+      return null;
+    }
+
+    const {
+      mouseX,
+      mouseY,
+      startPosition,
+      size,
+      widgetRect,
+      dashboardRect
+    } = dragData;
+
+    console.log('Handling drag:', { 
+      mouse: { mouseX, mouseY },
+      widget: { startPosition, size },
+      rects: { widgetRect, dashboardRect }
+    });
+
+    // Convert mouse position to grid coordinates
+    const gridPos = pixelsToGrid(mouseX, mouseY);
+    console.log('Grid position:', gridPos);
+    
+    // Calculate new position ensuring widget stays within bounds
+    const newPosition = {
+      column: Math.max(0, Math.min(
+        dashboardState.layout.columns - size.width,
+        gridPos.column
+      )),
+      row: Math.max(0, Math.min(
+        dashboardState.layout.rows - size.height,
+        gridPos.row
+      ))
+    };
+
+    console.log('Final position:', newPosition);
+
+    // Call the parent's onWidgetDrag callback
+    if (onWidgetDrag) {
+      onWidgetDrag(widgetId, newPosition);
+      return newPosition;
+    }
+
+    return null;
+  }, [dashboardState.layout, pixelsToGrid, onWidgetDrag]);
 
   // Handle widget resize
   const handleWidgetResize = useCallback((widgetId, resizeData) => {
@@ -78,8 +151,8 @@ const Dashboard = ({ children, onWidgetResize }) => {
     const mouseGridPos = pixelsToGrid(relativeX, relativeY);
     
     // Calculate new size based on resize direction
-    let newWidth = startSize.width || 1;  // Default to 1 if width is undefined
-    let newHeight = startSize.height || 1; // Default to 1 if height is undefined
+    let newWidth = startSize.width;
+    let newHeight = startSize.height;
 
     if (direction.isRight) {
       newWidth = Math.max(1, mouseGridPos.column - startPosition.column + 1);
@@ -165,7 +238,7 @@ const Dashboard = ({ children, onWidgetResize }) => {
         {React.Children.map(children, child => {
           if (!child) return null;
           
-          const { gridPosition = { column: 0, row: 0 }, gridSize = { width: 1, height: 1 } } = child.props;
+          const { gridPosition = { column: 0, row: 0 }, gridSize = { width: 1, height: 1 }, id } = child.props;
           
           // Ensure we have valid grid position and size
           const safeGridPosition = {
@@ -190,7 +263,8 @@ const Dashboard = ({ children, onWidgetResize }) => {
             style: widgetStyle,
             gridPosition: safeGridPosition,
             gridSize: safeGridSize,
-            onResize: (resizeData) => handleWidgetResize(child.props.id, resizeData)
+            onResize: (resizeData) => handleWidgetResize(id, resizeData),
+            onDrag: (dragData) => handleWidgetDrag(id, dragData)
           });
         })}
       </div>

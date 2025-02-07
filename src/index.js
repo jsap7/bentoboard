@@ -63,11 +63,27 @@ const App = () => {
     }));
   };
 
+  const handleWidgetDrag = (widgetId, newPosition) => {
+    console.log('App: handleWidgetDrag', { widgetId, newPosition });
+    setWidgets(widgets.map(widget => {
+      if (widget.id === widgetId) {
+        return {
+          ...widget,
+          gridPosition: newPosition
+        };
+      }
+      return widget;
+    }));
+  };
+
   return (
     <GlobalProvider>
       <div style={{ height: '100vh', overflow: 'hidden' }}>
         <Header onAddWidget={() => setIsWidgetSelectorOpen(true)} />
-        <Dashboard onWidgetResize={handleWidgetResize}>
+        <Dashboard 
+          onWidgetResize={handleWidgetResize}
+          onWidgetDrag={handleWidgetDrag}
+        >
           {widgets.map(widget => {
             const WidgetComponent = widget.component;
             return (
