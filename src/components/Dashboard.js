@@ -73,7 +73,42 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     };
   }, [dashboardState.layout]);
 
-  // Handle widget drag
+  // Check if two widgets overlap
+  const checkCollision = useCallback((pos1, size1, pos2, size2) => {
+    const left1 = pos1.column;
+    const right1 = pos1.column + size1.width - 1;
+    const top1 = pos1.row;
+    const bottom1 = pos1.row + size1.height - 1;
+
+    const left2 = pos2.column;
+    const right2 = pos2.column + size2.width - 1;
+    const top2 = pos2.row;
+    const bottom2 = pos2.row + size2.height - 1;
+
+    return !(right1 < left2 || left1 > right2 || bottom1 < top2 || top1 > bottom2);
+  }, []);
+
+  // Check if a widget position collides with any other widget
+  const hasCollisions = useCallback((testId, testPosition, testSize) => {
+    let hasCollision = false;
+    
+    React.Children.forEach(children, child => {
+      if (!child || child.props.id === testId) return;
+
+      const { gridPosition, gridSize } = child.props;
+      if (checkCollision(testPosition, testSize, gridPosition, gridSize)) {
+        console.log('Collision detected:', {
+          widget1: { id: testId, pos: testPosition, size: testSize },
+          widget2: { id: child.props.id, pos: gridPosition, size: gridSize }
+        });
+        hasCollision = true;
+      }
+    });
+
+    return hasCollision;
+  }, [children, checkCollision]);
+
+  // Handle widget drag with collision detection
   const handleWidgetDrag = useCallback((widgetId, dragData) => {
     if (!dashboardRef.current || !dragData) {
       console.warn('Missing dashboard ref or drag data');
@@ -111,6 +146,12 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
       ))
     };
 
+    // Check for collisions
+    if (hasCollisions(widgetId, newPosition, size)) {
+      console.log('Position rejected due to collision');
+      return null;
+    }
+
     console.log('Final position:', newPosition);
 
     // Call the parent's onWidgetDrag callback
@@ -120,9 +161,9 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     }
 
     return null;
-  }, [dashboardState.layout, pixelsToGrid, onWidgetDrag]);
+  }, [dashboardState.layout, pixelsToGrid, onWidgetDrag, hasCollisions]);
 
-  // Handle widget resize
+  // Handle widget resize with collision detection
   const handleWidgetResize = useCallback((widgetId, resizeData) => {
     if (!dashboardRef.current || !resizeData) return null;
 
@@ -174,13 +215,19 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
       height: Math.min(newHeight, dashboardState.layout.rows - startPosition.row)
     };
 
+    // Check for collisions with new size
+    if (hasCollisions(widgetId, startPosition, newSize)) {
+      console.log('Size rejected due to collision');
+      return null;
+    }
+
     // Call the parent's onWidgetResize callback
     if (onWidgetResize) {
       onWidgetResize(widgetId, newSize);
     }
 
     return newSize;
-  }, [dashboardState.layout, pixelsToGrid, onWidgetResize]);
+  }, [dashboardState.layout, pixelsToGrid, onWidgetResize, hasCollisions]);
 
   useEffect(() => {
     calculateRowHeight();
