@@ -60,16 +60,13 @@ const BaseWidget = ({
   }, [gridPosition]);
 
   const handleDragStart = useCallback((e) => {
-    console.log('Drag start');
     const widgetElement = e.currentTarget.closest('.widget');
     if (!widgetElement) {
-      console.warn('Widget element not found');
       return;
     }
 
     const dashboardElement = document.querySelector('.dashboard');
     if (!dashboardElement) {
-      console.warn('Dashboard element not found');
       return;
     }
 
@@ -79,10 +76,6 @@ const BaseWidget = ({
     // Calculate the offset of the mouse click relative to the widget
     const offsetX = e.clientX - widgetRect.left;
     const offsetY = e.clientY - widgetRect.top;
-
-    console.log('Initial offsets:', { offsetX, offsetY });
-    console.log('Widget rect:', widgetRect);
-    console.log('Dashboard rect:', dashboardRect);
     
     setIsDragging(true);
     widgetElement.style.transition = 'none';
@@ -91,7 +84,6 @@ const BaseWidget = ({
 
     const handleMouseMove = (e) => {
       if (!onDrag) {
-        console.warn('No onDrag handler provided');
         return;
       }
 
@@ -99,19 +91,8 @@ const BaseWidget = ({
       const mouseX = e.clientX - dashboardRect.left;
       const mouseY = e.clientY - dashboardRect.top;
 
-      console.log('Mouse move:', { 
-        clientX: e.clientX, 
-        clientY: e.clientY,
-        mouseX, 
-        mouseY, 
-        offsetX, 
-        offsetY 
-      });
-
       const adjustedX = mouseX - offsetX;
       const adjustedY = mouseY - offsetY;
-
-      console.log('Adjusted position:', { adjustedX, adjustedY });
 
       const dragData = {
         mouseX: adjustedX,
@@ -123,16 +104,12 @@ const BaseWidget = ({
       };
 
       const newPosition = onDrag(dragData);
-      console.log('Drag handler returned:', newPosition);
-      
       if (newPosition && newPosition.column !== undefined && newPosition.row !== undefined) {
-        console.log('Setting new position:', newPosition);
         setCurrentGridPosition(newPosition);
       }
     };
 
     const handleMouseUp = () => {
-      console.log('Drag end');
       setIsDragging(false);
       widgetElement.style.transition = '';
       widgetElement.style.zIndex = '';

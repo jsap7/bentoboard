@@ -30,7 +30,6 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
   // Convert pixel coordinates to grid coordinates
   const pixelsToGrid = useCallback((x, y) => {
     if (!dashboardRef.current) {
-      console.warn('Dashboard ref not available');
       return { column: 0, row: 0 };
     }
 
@@ -49,23 +48,9 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     const column = Math.floor(x / (cellWidth + dashboardState.layout.gap));
     const row = Math.floor(y / (cellHeight + dashboardState.layout.gap));
 
-    console.log('Grid calculation:', { 
-      input: { x, y },
-      dimensions: { containerWidth, containerHeight, cellWidth, cellHeight },
-      gaps: { totalGapWidth, totalGapHeight },
-      result: { column, row }
-    });
-
     // Ensure position is within bounds
     const boundedColumn = Math.max(0, Math.min(dashboardState.layout.columns - 1, column));
     const boundedRow = Math.max(0, Math.min(dashboardState.layout.rows - 1, row));
-
-    if (boundedColumn !== column || boundedRow !== row) {
-      console.log('Position bounded:', { 
-        from: { column, row }, 
-        to: { column: boundedColumn, row: boundedRow } 
-      });
-    }
 
     return {
       column: boundedColumn,
@@ -97,10 +82,6 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
 
       const { gridPosition, gridSize } = child.props;
       if (checkCollision(testPosition, testSize, gridPosition, gridSize)) {
-        console.log('Collision detected:', {
-          widget1: { id: testId, pos: testPosition, size: testSize },
-          widget2: { id: child.props.id, pos: gridPosition, size: gridSize }
-        });
         hasCollision = true;
       }
     });
@@ -111,7 +92,6 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
   // Handle widget drag with collision detection
   const handleWidgetDrag = useCallback((widgetId, dragData) => {
     if (!dashboardRef.current || !dragData) {
-      console.warn('Missing dashboard ref or drag data');
       return null;
     }
 
@@ -124,15 +104,8 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
       dashboardRect
     } = dragData;
 
-    console.log('Handling drag:', { 
-      mouse: { mouseX, mouseY },
-      widget: { startPosition, size },
-      rects: { widgetRect, dashboardRect }
-    });
-
     // Convert mouse position to grid coordinates
     const gridPos = pixelsToGrid(mouseX, mouseY);
-    console.log('Grid position:', gridPos);
     
     // Calculate new position ensuring widget stays within bounds
     const newPosition = {
@@ -148,11 +121,8 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
 
     // Check for collisions
     if (hasCollisions(widgetId, newPosition, size)) {
-      console.log('Position rejected due to collision');
       return null;
     }
-
-    console.log('Final position:', newPosition);
 
     // Call the parent's onWidgetDrag callback
     if (onWidgetDrag) {
@@ -178,7 +148,6 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
 
     // Ensure we have all required properties
     if (!startPosition || !startSize || !direction) {
-      console.warn('Missing required resize data properties');
       return null;
     }
 
@@ -217,7 +186,6 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
 
     // Check for collisions with new size
     if (hasCollisions(widgetId, startPosition, newSize)) {
-      console.log('Size rejected due to collision');
       return null;
     }
 

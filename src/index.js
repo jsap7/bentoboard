@@ -49,14 +49,12 @@ const App = () => {
         
         // Check for collisions at this position
         if (!checkCollision(testPosition, widgetSize)) {
-          console.log('Found empty position:', testPosition);
           return testPosition;
         }
       }
     }
     
-    // If no empty space found, try to find space in the first row
-    console.warn('No empty space found, defaulting to (0,0)');
+    // If no empty space found, return first position
     return { column: 0, row: 0 };
   };
 
@@ -68,7 +66,6 @@ const App = () => {
       
       // Double check for collisions
       if (checkCollision(position, widgetSize)) {
-        console.warn('Could not find non-colliding position for new widget');
         return;
       }
 
@@ -80,7 +77,6 @@ const App = () => {
         gridSize: widgetSize
       };
 
-      console.log('Adding new widget:', newWidget);
       setWidgets([...widgets, newWidget]);
       setIsWidgetSelectorOpen(false);
     }
@@ -95,7 +91,6 @@ const App = () => {
       if (widget.id === widgetId) {
         // Check if new size would cause collisions
         if (checkCollision(widget.gridPosition, newSize, widgetId)) {
-          console.log('Resize rejected due to collision');
           return widget;
         }
         return {
@@ -108,12 +103,10 @@ const App = () => {
   };
 
   const handleWidgetDrag = (widgetId, newPosition) => {
-    console.log('App: handleWidgetDrag', { widgetId, newPosition });
     setWidgets(widgets.map(widget => {
       if (widget.id === widgetId) {
         // Check if new position would cause collisions
         if (checkCollision(newPosition, widget.gridSize, widgetId)) {
-          console.log('Drag rejected due to collision');
           return widget;
         }
         return {
