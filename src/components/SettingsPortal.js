@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { useGlobalContext } from '../context/GlobalContext';
+import { useGlobalContext } from '../contexts/GlobalContext';
 import './SettingsPortal.css';
 
 const SettingsPortal = ({ children, onClose }) => {

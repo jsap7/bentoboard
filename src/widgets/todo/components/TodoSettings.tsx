@@ -1,7 +1,7 @@
 import React from 'react';
 import { WidgetSettingsProps } from '../../shared/types';
 import { TodoSettings as TodoSettingsType, TodoDisplayMode } from '../TodoWidget';
-import { useGlobalContext } from '../../../context/GlobalContext';
+import { useGlobalContext } from '../../../contexts/GlobalContext';
 
 const TodoSettings: React.FC<WidgetSettingsProps> = ({
   settings,

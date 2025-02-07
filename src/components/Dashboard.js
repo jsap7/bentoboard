@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { useGlobalContext } from '../context/GlobalContext';
+import { useGlobalContext } from '../contexts/GlobalContext';
 import { getCellDimensions, snapToGrid } from '../utils/gridManager';
 
 const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {

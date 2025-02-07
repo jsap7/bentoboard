@@ -1,7 +1,7 @@
 import React from 'react';
 import { WidgetSettingsProps } from '../../shared/types';
 import { ClockSettings as ClockSettingsType, ClockDisplayMode, ClockThemeMode } from '../../shared/types';
-import { useGlobalContext } from '../../../context/GlobalContext';
+import { useGlobalContext } from '../../../contexts/GlobalContext';
 
 const ClockSettings: React.FC<WidgetSettingsProps> = ({
   settings,

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { GlobalProvider } from './context/GlobalContext';
+import { GlobalProvider } from './contexts/GlobalContext';
 import { WidgetStateProvider } from './contexts/WidgetStateContext';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';

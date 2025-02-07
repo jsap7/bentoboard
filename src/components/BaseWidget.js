@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useGlobalContext } from '../context/GlobalContext';
+import { useGlobalContext } from '../contexts/GlobalContext';
 import SettingsPortal from './SettingsPortal';
 import './BaseWidget.css';
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useGlobalContext, availableFonts } from '../context/GlobalContext';
+import { useGlobalContext, availableFonts } from '../contexts/GlobalContext';
 import { listWidgets } from '../registry/widgetRegistry';
 import { FiSettings, FiPlus, FiX } from 'react-icons/fi';
 import './Header.css';
