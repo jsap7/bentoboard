@@ -269,7 +269,7 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
         ))}
       </div>
       {SettingsComponent && showSettings && (
-        <SettingsPortal>
+        <SettingsPortal onClose={handleSettingsClose}>
           <SettingsComponent
             settings={widgetState.settings}
             onSettingsChange={handleSettingsChange}

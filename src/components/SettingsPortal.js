@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { useGlobalContext } from '../context/GlobalContext';
 import './SettingsPortal.css';
 
-const SettingsPortal = ({ children }) => {
+const SettingsPortal = ({ children, onClose }) => {
   const [portalContainer, setPortalContainer] = useState(null);
+  const { theme } = useGlobalContext();
 
   useEffect(() => {
     // Check if container already exists
@@ -29,7 +31,10 @@ const SettingsPortal = ({ children }) => {
   if (!portalContainer) return null;
 
   return ReactDOM.createPortal(
-    <div className="settings-portal">
+    <div 
+      className="settings-portal"
+      style={{ '--accent-color': theme.accentColor }}
+    >
       {children}
     </div>,
     portalContainer

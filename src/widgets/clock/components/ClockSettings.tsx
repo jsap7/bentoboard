@@ -1,105 +1,104 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { WidgetSettingsProps } from '../../shared/types';
 import { ClockSettings as ClockSettingsType, ClockDisplayMode } from '../../shared/types';
-import '../styles/ClockWidget.css';
+import { useGlobalContext } from '../../../context/GlobalContext';
 
-interface ClockSettings {
-  showSeconds: boolean;
-  showDate: boolean;
-  use24Hour: boolean;
-  displayMode?: ClockDisplayMode;
-}
-
-const ClockSettings: React.FC<WidgetSettingsProps> = ({ 
-  settings, 
-  onSettingsChange, 
-  onClose 
+const ClockSettings: React.FC<WidgetSettingsProps> = ({
+  settings,
+  onSettingsChange,
+  onClose,
+  availableModes = []
 }) => {
-  const [localSettings, setLocalSettings] = useState<ClockSettingsType>(settings);
+  const { theme } = useGlobalContext();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newSettings = {
-      ...localSettings,
+    onSettingsChange({
+      ...settings,
       [e.target.name]: e.target.checked
-    };
-    setLocalSettings(newSettings);
-    onSettingsChange(newSettings);
+    });
   };
 
   const handleModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newSettings = {
-      ...localSettings,
+    onSettingsChange({
+      ...settings,
       displayMode: e.target.value as ClockDisplayMode
-    };
-    setLocalSettings(newSettings);
-    onSettingsChange(newSettings);
+    });
   };
 
   return (
-    <div className="settings-content">
+    <>
       <div className="settings-header">
-        <h2 className="settings-title">Clock Settings</h2>
-        <button className="settings-close" onClick={onClose}>
+        <h2 className="settings-title">Clock</h2>
+        <button className="settings-close" onClick={onClose} aria-label="Close settings">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
+            <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       </div>
-      <div className="clock-settings-body">
-        <div className="clock-settings-option">
-          <label htmlFor="displayMode">Display Mode</label>
-          <select
-            id="displayMode"
-            name="displayMode"
-            value={localSettings.displayMode || 'digital'}
-            onChange={handleModeChange}
-            style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '4px',
-              color: 'inherit',
-              padding: '4px 8px',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="digital">Digital</option>
-            <option value="analog">Analog</option>
-            <option value="minimal">Minimal</option>
-          </select>
-        </div>
-        <div className="clock-settings-option">
-          <input
-            type="checkbox"
-            id="showSeconds"
-            name="showSeconds"
-            checked={localSettings.showSeconds}
-            onChange={handleChange}
-          />
-          <label htmlFor="showSeconds">Show Seconds</label>
-        </div>
-        <div className="clock-settings-option">
-          <input
-            type="checkbox"
-            id="showDate"
-            name="showDate"
-            checked={localSettings.showDate}
-            onChange={handleChange}
-          />
-          <label htmlFor="showDate">Show Date</label>
-        </div>
-        <div className="clock-settings-option">
-          <input
-            type="checkbox"
-            id="use24Hour"
-            name="use24Hour"
-            checked={localSettings.use24Hour}
-            onChange={handleChange}
-          />
-          <label htmlFor="use24Hour">Use 24-Hour Format</label>
+      <div className="settings-content" style={{ '--accent-color': theme.accentColor } as React.CSSProperties}>
+        {availableModes.length > 0 && (
+          <div className="settings-section">
+            <h3 className="settings-section-title">Display</h3>
+            <div className="settings-option">
+              <span className="settings-option-label">Mode</span>
+              <select
+                value={settings.displayMode || 'digital'}
+                onChange={handleModeChange}
+                className="settings-select"
+              >
+                {availableModes.map(mode => (
+                  <option key={mode} value={mode}>
+                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        <div className="settings-section">
+          <h3 className="settings-section-title">Options</h3>
+          <div className="settings-option">
+            <span className="settings-option-label">Show Seconds</span>
+            <label className="settings-switch">
+              <input
+                type="checkbox"
+                checked={settings.showSeconds}
+                onChange={handleChange}
+                name="showSeconds"
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+
+          <div className="settings-option">
+            <span className="settings-option-label">Show Date</span>
+            <label className="settings-switch">
+              <input
+                type="checkbox"
+                checked={settings.showDate}
+                onChange={handleChange}
+                name="showDate"
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+
+          <div className="settings-option">
+            <span className="settings-option-label">24-Hour Format</span>
+            <label className="settings-switch">
+              <input
+                type="checkbox"
+                checked={settings.use24Hour}
+                onChange={handleChange}
+                name="use24Hour"
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
