@@ -7,34 +7,46 @@ export const useGlobalContext = () => useContext(GlobalContext);
 // Curated list of Google Fonts with their properties
 export const availableFonts = [
   {
-    family: 'League Spartan',
+    family: 'Prompt',
     category: 'sans-serif',
     weights: [400, 500, 600, 700],
-    url: 'https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&display=swap'
+    url: 'https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap'
   },
   {
-    family: 'Space Grotesk',
+    family: 'Lexend',
     category: 'sans-serif',
     weights: [400, 500, 600, 700],
-    url: 'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap'
+    url: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap'
   },
   {
-    family: 'Outfit',
-    category: 'sans-serif',
+    family: 'Comfortaa',
+    category: 'display',
     weights: [400, 500, 600, 700],
-    url: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap'
+    url: 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap'
   },
   {
-    family: 'Inter',
-    category: 'sans-serif',
-    weights: [400, 500, 600, 700],
-    url: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
+    family: 'Lilita One',
+    category: 'display',
+    weights: [400],
+    url: 'https://fonts.googleapis.com/css2?family=Lilita+One&display=swap'
   },
   {
-    family: 'Plus Jakarta Sans',
-    category: 'sans-serif',
-    weights: [400, 500, 600, 700],
-    url: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap'
+    family: 'Rowdies',
+    category: 'display',
+    weights: [400, 700],
+    url: 'https://fonts.googleapis.com/css2?family=Rowdies:wght@400;700&display=swap'
+  },
+  {
+    family: 'Passion One',
+    category: 'display',
+    weights: [400, 700],
+    url: 'https://fonts.googleapis.com/css2?family=Passion+One:wght@400;700&display=swap'
+  },
+  {
+    family: 'Righteous',
+    category: 'display',
+    weights: [400],
+    url: 'https://fonts.googleapis.com/css2?family=Righteous&display=swap'
   }
 ];
 

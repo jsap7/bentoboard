@@ -84,32 +84,37 @@ const Header = ({ onAddWidget }) => {
                     </button>
                   </div>
                   <div className="widget-list">
-                    {widgets.map(([id, config]) => (
-                      <button
-                        key={id}
-                        className="widget-option"
-                        onClick={() => {
-                          onAddWidget(id);
-                          setIsDropdownOpen(false);
-                        }}
-                      >
-                        <div className="widget-option-content">
-                          <div className="widget-option-header">
-                            <h3>{config.title}</h3>
-                            <span className="widget-size">
-                              {config.defaultSize.width}x{config.defaultSize.height}
-                            </span>
+                    {widgets.map(([id, config]) => {
+                      const Icon = config.icon;
+                      return (
+                        <button
+                          key={id}
+                          className="widget-option"
+                          onClick={() => {
+                            onAddWidget(id);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          <div className="widget-option-content">
+                            <div className="widget-option-header">
+                              <div className="widget-option-title">
+                                {Icon && <Icon className="widget-option-icon" />}
+                                <h3>{config.title}</h3>
+                              </div>
+                            </div>
+                            <p>{config.description}</p>
                           </div>
-                          <p>{config.description}</p>
-                        </div>
-                      </button>
-                    ))}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </>
             )}
           </div>
         </div>
+
+        <div className="header-title">BENTOBOARD</div>
 
         <div className="header-right">
           <div className="settings-dropdown-container">
@@ -150,8 +155,7 @@ const Header = ({ onAddWidget }) => {
                               onClick={() => handleFontChange(font.family)}
                               style={{ fontFamily: font.family }}
                             >
-                              <span className="font-name">{font.family}</span>
-                              <span className="font-preview">The quick brown fox</span>
+                              {font.family}
                             </button>
                           ))}
                         </div>

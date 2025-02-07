@@ -17,6 +17,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .header-left {
@@ -25,12 +26,68 @@
   gap: 16px;
 }
 
+.header-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'League Spartan', sans-serif;
+  font-size: 2.2rem;
+  color: white;
+  letter-spacing: -0.05em;
+  font-weight: 900;
+}
+
+.header-title:hover {
+  background: linear-gradient(45deg,  #FFFFFF,#FF88DC, #FF5154, #9070C7, #227C9D, #3EFF8B, #FFFFFF);
+  background-size: 500% 500%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 10s ease infinite, scaleUp 0.3s ease-out forwards;
+  transform-origin: center center;
+}
+
+.header-title:not(:hover) {
+  animation: scaleDown 1s ease-out forwards;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes scaleDown {
+  from {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
 .dashboard-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
   background: linear-gradient(45deg, #6366f1, #8b5cf6);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -48,26 +105,67 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .add-widget-button:hover,
 .settings-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: white;
   transform: translateY(-1px);
+}
+
+.add-widget-button.active,
+.settings-button.active {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: white;
 }
 
 .add-widget-button svg,
 .settings-button svg {
   width: 20px;
   height: 20px;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.add-widget-button.active,
-.settings-button.active {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
+.add-widget-button:hover svg {
+  transform: rotate(90deg);
+}
+
+.add-widget-button.active svg {
+  transform: rotate(135deg);
+}
+
+.settings-button:hover svg {
+  transform: rotate(30deg);
+}
+
+/* Widget option icons */
+.widget-option-title {
+  display: flex;
+  align-items: center;
+}
+
+.widget-option-icon {
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-right: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget-option:hover .widget-option-icon {
+  color: var(--accent-color);
+  transform: scale(1.2) rotate(20deg);
+}
+
+.widget-option-title h3 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .widget-dropdown-container,
@@ -177,20 +275,20 @@
 .widget-option-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .widget-option-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
 }
 
-.widget-option-header h3 {
+.widget-option p {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
 }
 
 .widget-size {
@@ -199,13 +297,6 @@
   background-color: rgba(255, 255, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
-}
-
-.widget-option p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.4;
 }
 
 .settings-content {

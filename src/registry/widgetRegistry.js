@@ -1,5 +1,6 @@
 import ClockWidget from '../widgets/clock/ClockWidget';
 import TodoWidget from '../widgets/todo/TodoWidget';
+import { FiClock, FiCheckSquare } from 'react-icons/fi';
 
 const widgetRegistry = new Map();
 
@@ -47,6 +48,7 @@ export const hasWidget = (id) => {
 // Register the clock widget
 registerWidget('clock', {
   component: ClockWidget,
+  icon: FiClock,
   title: 'Clock',
   description: 'Displays current time and date in various formats',
   defaultSize: { width: 2, height: 2 }
@@ -55,6 +57,7 @@ registerWidget('clock', {
 // Register the todo widget
 registerWidget('todo', {
   component: TodoWidget,
+  icon: FiCheckSquare,
   title: 'Todo List',
   description: 'Keep track of tasks and todos',
   defaultSize: { width: 2, height: 2 }
