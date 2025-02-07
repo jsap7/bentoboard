@@ -134,7 +134,7 @@ const Header = ({ onAddWidget }) => {
                 />
                 <div className="settings-dropdown">
                   <div className="widget-dropdown-header">
-                    <h2>Global Settings</h2>
+                    <h2>Settings</h2>
                     <button 
                       className="close-dropdown"
                       onClick={() => setIsSettingsOpen(false)}
@@ -144,9 +144,9 @@ const Header = ({ onAddWidget }) => {
                   </div>
                   <div className="settings-content">
                     <div className="settings-section">
-                      <h3>Theme</h3>
+                      <h3 className="settings-section-title">Appearance</h3>
                       <div className="settings-option">
-                        <label>Font Family</label>
+                        <span className="settings-option-label">Font</span>
                         <div className="font-options">
                           {availableFonts.map((font) => (
                             <button
@@ -161,18 +161,65 @@ const Header = ({ onAddWidget }) => {
                         </div>
                       </div>
                       <div className="settings-option">
-                        <label>Accent Color</label>
+                        <span className="settings-option-label">Accent Color</span>
                         <div className="color-options">
-                          {['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#84cc16', '#06b6d4'].map(color => (
+                          {[
+                            { color: '#6366f1', name: 'Indigo' },
+                            { color: '#818cf8', name: 'Blue' },
+                            { color: '#38bdf8', name: 'Sky Blue' },
+                            { color: '#0891b2', name: 'Ocean Blue' },
+                            { color: '#06b6d4', name: 'Cyan' },
+                            { color: '#2dd4bf', name: 'Teal' },
+                            { color: '#34d399', name: 'Emerald' },
+                            { color: '#16a34a', name: 'Forest Green' },
+                            { color: '#84cc16', name: 'Lime' },
+                            { color: '#fbbf24', name: 'Amber' },
+                            { color: '#f97316', name: 'Orange' },
+                            { color: '#fb7185', name: 'Rose' },
+                            { color: '#f43f5e', name: 'Red' },
+                            { color: '#dc2626', name: 'Crimson' },
+                            { color: '#ec4899', name: 'Pink' },
+                            { color: '#8b5cf6', name: 'Purple' },
+                            { color: '#9333ea', name: 'Royal Purple' },
+                            { color: '#a78bfa', name: 'Violet' },
+                            { color: '#c084fc', name: 'Lavender' },
+                            { color: '#e879f9', name: 'Magenta' }
+                          ].map(({ color, name }) => (
                             <button
                               key={color}
                               className={`color-option ${theme?.accentColor === color ? 'active' : ''}`}
                               style={{ backgroundColor: color }}
                               onClick={() => handleAccentColorChange(color)}
-                              aria-label={`Set accent color to ${color}`}
+                              aria-label={`Set accent color to ${name}`}
+                              title={name}
                             />
                           ))}
                         </div>
+                      </div>
+                    </div>
+
+                    <div className="settings-section">
+                      <h3 className="settings-section-title">Coming Soon</h3>
+                      <div className="settings-option">
+                        <span className="settings-option-label">Light Mode</span>
+                        <label className="settings-switch">
+                          <input
+                            type="checkbox"
+                            checked={false}
+                            disabled
+                            onChange={() => {}}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="settings-option">
+                        <span className="settings-option-label">Alternative Grid Sizes</span>
+                        <select className="settings-select" disabled>
+                          <option value="default">Current (12×6)</option>
+                          <option value="compact">Coming Soon: Compact (8×4)</option>
+                          <option value="large">Coming Soon: Large (16×8)</option>
+                          <option value="ultrawide">Coming Soon: Ultrawide (21:9)</option>
+                        </select>
                       </div>
                     </div>
                   </div>

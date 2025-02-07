@@ -4,6 +4,7 @@ import ClockSettings from './components/ClockSettings';
 import { formatTime, formatDate, getDefaultClockSettings } from './utils/timeUtils';
 import { WidgetProps, ClockSettings as ClockSettingsType, WidgetConfig } from '../shared/types';
 import './styles/ClockWidget.css';
+import { useWidgetState } from '../../contexts/WidgetStateContext';
 
 interface ClockWidgetProps extends WidgetProps {}
 
@@ -19,7 +20,8 @@ interface CustomCSSProperties extends React.CSSProperties {
 
 // Define size categories for different layouts
 type SizeCategory = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge';
-type DisplayMode = 'digital' | 'analog' | 'minimal';
+type DisplayMode = 'digital' | 'minimal';
+type ThemeMode = 'minimal' | 'modern' | 'classic';
 
 interface SizeConfig {
   category: SizeCategory;
@@ -28,7 +30,6 @@ interface SizeConfig {
 }
 
 const getSizeConfig = (width: number, height: number): SizeConfig => {
-  // Group similar sizes together
   if (width === 1 && height === 1) {
     return {
       category: 'tiny',
@@ -46,22 +47,14 @@ const getSizeConfig = (width: number, height: number): SizeConfig => {
   if (width === 2 && height === 2) {
     return {
       category: 'medium',
-      availableModes: ['digital', 'analog', 'minimal'],
+      availableModes: ['digital', 'minimal'],
       defaultMode: 'digital'
     };
   }
-  if ((width === 3 && height === 2) || (width === 2 && height === 3)) {
-    return {
-      category: 'large',
-      availableModes: ['digital', 'analog'],
-      defaultMode: 'digital'
-    };
-  }
-  // 3x3, 4x2, 4x3, 4x4, etc.
   return {
-    category: 'xlarge',
-    availableModes: ['digital', 'analog'],
-    defaultMode: 'analog'
+    category: width >= 3 || height >= 3 ? 'xlarge' : 'large',
+    availableModes: ['digital', 'minimal'],
+    defaultMode: 'digital'
   };
 };
 
@@ -75,41 +68,56 @@ const ClockWidget: ClockWidgetComponent = ({
   onDrag
 }) => {
   const [time, setTime] = React.useState(new Date());
-  const [settings, setSettings] = React.useState<ClockSettingsType>(getDefaultClockSettings());
+  const [widgetState, updateWidgetState] = useWidgetState({
+    id,
+    initialGridPosition: gridPosition,
+    initialGridSize: gridSize,
+    initialSettings: getDefaultClockSettings(),
+  });
+
+  const settings = widgetState.settings as ClockSettingsType;
 
   // Get size configuration based on current dimensions
   const sizeConfig = React.useMemo(() => 
-    getSizeConfig(gridSize.width, gridSize.height),
-    [gridSize.width, gridSize.height]
+    getSizeConfig(widgetState.gridSize.width, widgetState.gridSize.height),
+    [widgetState.gridSize.width, widgetState.gridSize.height]
   );
 
   React.useEffect(() => {
     const timer = setInterval(() => {
       setTime(new Date());
-    }, settings.showSeconds ? 1000 : 60000);
+    }, settings.showMilliseconds ? 100 : settings.showSeconds ? 1000 : 60000);
 
     return () => clearInterval(timer);
-  }, [settings.showSeconds]);
+  }, [settings.showSeconds, settings.showMilliseconds]);
 
-  const timeString = React.useMemo(() => {
-    return formatTime(time, {
-      showSeconds: settings.showSeconds,
-      use24Hour: settings.use24Hour
-    });
-  }, [time, settings.showSeconds, settings.use24Hour]);
+  const formatTimeSegments = React.useCallback((date: Date) => {
+    const hours = settings.use24Hour 
+      ? date.getHours().toString().padStart(2, '0')
+      : (date.getHours() % 12 || 12).toString();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    const milliseconds = Math.floor(date.getMilliseconds() / 100);
+    const period = date.getHours() >= 12 ? 'PM' : 'AM';
 
-  const dateString = React.useMemo(() => {
-    return formatDate(time, {
-      weekday: 'long',
+    return { hours, minutes, seconds, milliseconds, period };
+  }, [settings.use24Hour]);
+
+  const timeSegments = React.useMemo(() => formatTimeSegments(time), [time, formatTimeSegments]);
+
+  const dateSegments = React.useMemo(() => {
+    const weekday = time.toLocaleDateString(undefined, { weekday: 'long' });
+    const fullDate = time.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+    return { weekday, fullDate };
   }, [time]);
 
   const handleSettingsChange = React.useCallback((newSettings: ClockSettingsType) => {
-    setSettings(newSettings);
-  }, []);
+    updateWidgetState({ settings: newSettings });
+  }, [updateWidgetState]);
 
   // Calculate grid size attribute and category
   const gridSizeAttribute = `${gridSize.width}x${gridSize.height}`;
@@ -125,44 +133,53 @@ const ClockWidget: ClockWidgetComponent = ({
     return baseStyle;
   }, [gridSize]);
 
+  const renderDigitalClock = () => {
+    return (
+      <>
+        <div className="clock-time">
+          <span>{timeSegments.hours}</span>
+          <span className="separator">:</span>
+          <span>{timeSegments.minutes}</span>
+          {settings.showSeconds && (
+            <>
+              <span className="separator">:</span>
+              <span className="seconds">
+                {timeSegments.seconds}
+                {settings.showMilliseconds && `.${timeSegments.milliseconds}`}
+              </span>
+            </>
+          )}
+          {!settings.use24Hour && <span className="period">{timeSegments.period}</span>}
+        </div>
+        {settings.showDate && (
+          <div className="clock-date">
+            <div className="weekday">{dateSegments.weekday}</div>
+            <div className="full-date">{dateSegments.fullDate}</div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const renderMinimalClock = () => {
+    return (
+      <div className="clock-minimal">
+        <div className="clock-time">
+          {timeSegments.hours}:{timeSegments.minutes}
+          {!settings.use24Hour && <span className="period">{timeSegments.period}</span>}
+        </div>
+        {settings.showDate && (
+          <div className="clock-date">
+            {dateSegments.fullDate}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderClock = () => {
     const mode = settings.displayMode || sizeConfig.defaultMode;
-
-    switch (mode) {
-      case 'analog':
-        return (
-          <div className="clock-analog">
-            {/* We'll implement the analog clock face later */}
-            <div className="clock-face">
-              <div className="clock-hands">
-                <div className="hand hour" style={{ transform: `rotate(${(time.getHours() % 12) * 30 + time.getMinutes() * 0.5}deg)` }} />
-                <div className="hand minute" style={{ transform: `rotate(${time.getMinutes() * 6}deg)` }} />
-                {settings.showSeconds && (
-                  <div className="hand second" style={{ transform: `rotate(${time.getSeconds() * 6}deg)` }} />
-                )}
-              </div>
-            </div>
-            {settings.showDate && <div className="clock-date">{dateString}</div>}
-          </div>
-        );
-
-      case 'minimal':
-        return (
-          <>
-            <div className="clock-time minimal">{timeString}</div>
-            {settings.showDate && <div className="clock-date minimal">{dateString}</div>}
-          </>
-        );
-
-      case 'digital':
-      default:
-        return (
-          <>
-            <div className="clock-time">{timeString}</div>
-            {settings.showDate && <div className="clock-date">{dateString}</div>}
-          </>
-        );
-    }
+    return mode === 'minimal' ? renderMinimalClock() : renderDigitalClock();
   };
 
   return (
@@ -185,6 +202,7 @@ const ClockWidget: ClockWidgetComponent = ({
         data-grid-size={gridSizeAttribute}
         data-size-category={categoryAttribute}
         data-display-mode={settings.displayMode || sizeConfig.defaultMode}
+        data-theme={settings.theme || 'modern'}
       >
         {renderClock()}
       </div>

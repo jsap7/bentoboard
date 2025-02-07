@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GlobalProvider } from './context/GlobalContext';
+import { WidgetStateProvider } from './contexts/WidgetStateContext';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import WidgetSelector from './components/WidgetSelector';
@@ -155,39 +156,43 @@ const App = () => {
   };
 
   return (
-    <GlobalProvider>
-      <div style={{ height: '100vh', overflow: 'hidden' }}>
-        <Header onAddWidget={() => setIsWidgetSelectorOpen(true)} />
-        <Dashboard 
-          onWidgetResize={handleWidgetResize}
-          onWidgetDrag={handleWidgetDrag}
-        >
-          {widgets.map(widget => {
-            const WidgetComponent = widget.component;
-            return (
-              <WidgetComponent
-                key={widget.id}
-                id={widget.id}
-                onClose={() => handleRemoveWidget(widget.id)}
-                gridPosition={widget.gridPosition}
-                gridSize={widget.gridSize}
-                settings={widget.settings}
-                data={widget.data}
-              />
-            );
-          })}
-        </Dashboard>
-        {isWidgetSelectorOpen && (
-          <WidgetSelector
-            onSelect={handleAddWidget}
-            onClose={() => setIsWidgetSelectorOpen(false)}
-          />
-        )}
-      </div>
-    </GlobalProvider>
+    <div style={{ height: '100vh', overflow: 'hidden' }}>
+      <Header onAddWidget={() => setIsWidgetSelectorOpen(true)} />
+      <Dashboard 
+        onWidgetResize={handleWidgetResize}
+        onWidgetDrag={handleWidgetDrag}
+      >
+        {widgets.map(widget => {
+          const WidgetComponent = widget.component;
+          return (
+            <WidgetComponent
+              key={widget.id}
+              id={widget.id}
+              onClose={() => handleRemoveWidget(widget.id)}
+              gridPosition={widget.gridPosition}
+              gridSize={widget.gridSize}
+              settings={widget.settings}
+              data={widget.data}
+            />
+          );
+        })}
+      </Dashboard>
+      {isWidgetSelectorOpen && (
+        <WidgetSelector
+          onSelect={handleAddWidget}
+          onClose={() => setIsWidgetSelectorOpen(false)}
+        />
+      )}
+    </div>
   );
 };
 
 const container = document.getElementById('root');
 const root = createRoot(container);
-root.render(<App />); 
+root.render(
+  <WidgetStateProvider>
+    <GlobalProvider>
+      <App />
+    </GlobalProvider>
+  </WidgetStateProvider>
+); 

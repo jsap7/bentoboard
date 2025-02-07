@@ -101,13 +101,16 @@ export interface BaseWidgetProps extends WidgetProps {
 }
 
 // Clock-specific types
-export type ClockDisplayMode = 'digital' | 'analog' | 'minimal';
+export type ClockDisplayMode = 'digital' | 'minimal';
+export type ClockThemeMode = 'minimal' | 'modern' | 'classic';
 
 export interface ClockSettings {
   showSeconds: boolean;
+  showMilliseconds: boolean;
   showDate: boolean;
   use24Hour: boolean;
   displayMode?: ClockDisplayMode;
+  theme?: ClockThemeMode;
 }
 
 export interface BaseWidgetState<T = any, S = any> {

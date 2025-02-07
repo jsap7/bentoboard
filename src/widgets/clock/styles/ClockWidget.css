@@ -5,151 +5,121 @@
   align-items: center;
   height: 100%;
   width: 100%;
-  padding: 1rem;
+  padding: var(--widget-padding, 1rem);
   text-align: center;
   box-sizing: border-box;
 }
 
-/* Base styles for all modes */
+/* Digital clock styles */
 .clock-time {
   font-weight: 600;
-  letter-spacing: 0.05em;
-  line-height: 1.2;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   color: var(--text-primary, rgba(255, 255, 255, 0.9));
   transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.clock-time .separator {
+  opacity: 0.6;
+}
+
+.clock-time .seconds {
+  font-size: 0.6em;
+  opacity: 0.7;
+  margin-left: 0.2em;
+  align-self: flex-start;
+  margin-top: 0.4em;
+}
+
+.clock-time .period {
+  font-size: 0.5em;
+  opacity: 0.7;
+  margin-left: 0.4em;
+  align-self: flex-start;
+  margin-top: 0.4em;
+  text-transform: uppercase;
+  font-weight: 500;
 }
 
 .clock-date {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
   transition: all 0.2s ease;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-/* Size category styles */
-/* Tiny (1x1) */
+.clock-date .weekday {
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.clock-date .full-date {
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+/* Minimal mode styles */
+.clock-minimal {
+  font-weight: 400;
+  letter-spacing: 0;
+  opacity: 0.9;
+}
+
+.clock-minimal .clock-date {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
+/* Size variations */
 [data-size-category="tiny"] .clock-time {
   font-size: 1.2rem;
-  margin-bottom: 0.2rem;
 }
 
 [data-size-category="tiny"] .clock-date {
   font-size: 0.7rem;
 }
 
-/* Small (2x1, 1x2) */
 [data-size-category="small"] .clock-time {
   font-size: 1.8rem;
-  margin-bottom: 0.3rem;
 }
 
 [data-size-category="small"] .clock-date {
   font-size: 0.8rem;
 }
 
-/* Medium (2x2) */
 [data-size-category="medium"] .clock-time {
   font-size: 2.5rem;
-  margin-bottom: 0.5rem;
 }
 
 [data-size-category="medium"] .clock-date {
   font-size: 1rem;
 }
 
-/* Large (3x2, 2x3) */
 [data-size-category="large"] .clock-time {
   font-size: 3.2rem;
-  margin-bottom: 0.7rem;
 }
 
 [data-size-category="large"] .clock-date {
   font-size: 1.2rem;
 }
 
-/* Extra Large (3x3, 4x2, 4x3, 4x4) */
 [data-size-category="xlarge"] .clock-time {
   font-size: 4rem;
-  margin-bottom: 1rem;
 }
 
 [data-size-category="xlarge"] .clock-date {
   font-size: 1.4rem;
 }
 
-/* Display mode specific styles */
-/* Minimal mode */
-[data-display-mode="minimal"] .clock-time {
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
-[data-display-mode="minimal"] .clock-date {
-  font-size: 0.8em;
-  opacity: 0.7;
-}
-
-/* Digital mode - already covered by base styles */
-
-/* Analog mode */
-.clock-analog {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.clock-face {
-  position: relative;
-  width: 80%;
-  height: 0;
-  padding-bottom: 80%;
-  background: var(--clock-face-bg, rgba(255, 255, 255, 0.05));
-  border-radius: 50%;
-  margin-bottom: 1rem;
-}
-
-.clock-hands {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.hand {
-  position: absolute;
-  bottom: 50%;
-  left: 50%;
-  transform-origin: 50% 100%;
-  background: var(--text-primary, rgba(255, 255, 255, 0.9));
-  border-radius: 4px;
-  transition: transform 0.2s cubic-bezier(0.4, 2.08, 0.55, 0.44);
-}
-
-.hand.hour {
-  width: 4px;
-  height: 25%;
-  margin-left: -2px;
-}
-
-.hand.minute {
-  width: 3px;
-  height: 35%;
-  margin-left: -1.5px;
-  background: var(--text-secondary, rgba(255, 255, 255, 0.7));
-}
-
-.hand.second {
-  width: 1px;
-  height: 40%;
-  margin-left: -0.5px;
-  background: var(--accent-color, #6366f1);
-}
-
-/* Layout variations */
-/* Wide format (2x1) */
+/* Wide format styles */
 [data-grid-size="2x1"] .clock-widget-content {
   flex-direction: row;
   justify-content: space-around;
@@ -157,6 +127,7 @@
 }
 
 [data-grid-size="2x1"] .clock-date {
+  margin-top: 0;
   align-self: center;
 }
 
@@ -240,4 +211,21 @@
   width: 1rem;
   height: 1rem;
   cursor: pointer;
+}
+
+/* Theme variations */
+[data-theme="minimal"] .clock-time {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="modern"] .clock-time {
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+[data-theme="classic"] .clock-time {
+  font-family: monospace;
+  letter-spacing: 0.1em;
+  font-weight: 500;
 } 

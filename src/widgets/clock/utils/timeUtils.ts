@@ -34,6 +34,9 @@ export const getDefaultDateFormatOptions = (): DateFormatOptions => ({
 
 export const getDefaultClockSettings = () => ({
   showSeconds: true,
+  showMilliseconds: false,
   showDate: true,
-  use24Hour: false
+  use24Hour: false,
+  displayMode: 'digital' as const,
+  theme: 'modern' as const
 }); 
