@@ -6,6 +6,7 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
   const { theme, dashboardState } = useGlobalContext();
   const dashboardRef = useRef(null);
   const [dynamicRowHeight, setDynamicRowHeight] = useState(dashboardState.layout.rowHeight);
+  const [isInteracting, setIsInteracting] = useState(false);
 
   const dashboardStyle = {
     position: 'relative',
@@ -95,6 +96,8 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
       return null;
     }
 
+    setIsInteracting(true);  // Show grid when dragging starts
+
     const {
       mouseX,
       mouseY,
@@ -136,6 +139,8 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
   // Handle widget resize with collision detection
   const handleWidgetResize = useCallback((widgetId, resizeData) => {
     if (!dashboardRef.current || !resizeData) return null;
+
+    setIsInteracting(true);  // Show grid when resizing starts
 
     const {
       mouseX,
@@ -203,6 +208,15 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     return () => window.removeEventListener('resize', calculateRowHeight);
   }, [calculateRowHeight]);
 
+  // Add effect to hide grid when interaction ends
+  useEffect(() => {
+    if (isInteracting) {
+      const hideGrid = () => setIsInteracting(false);
+      window.addEventListener('mouseup', hideGrid);
+      return () => window.removeEventListener('mouseup', hideGrid);
+    }
+  }, [isInteracting]);
+
   const widgetContainerStyle = {
     position: 'absolute',
     top: dashboardState.layout.gap,
@@ -232,7 +246,8 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
               gridRow: row + 1,
               height: '100%',
               transition: 'all 0.2s ease-in-out',
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              opacity: isInteracting ? 1 : 0
             }}
           />
         );
@@ -247,6 +262,7 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
       className="dashboard"
       style={dashboardStyle}
       data-testid="dashboard"
+      data-interacting={isInteracting}
     >
       <div style={widgetContainerStyle}>
         {createGridCells()}

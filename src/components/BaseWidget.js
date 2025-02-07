@@ -183,7 +183,8 @@ const BaseWidget = ({
     '--text-primary': theme.text,
     '--text-secondary': 'rgba(255, 255, 255, 0.6)',
     '--surface': theme.surface,
-    '--widget-bg': 'rgba(255, 255, 255, 0.1)'
+    '--widget-bg': 'rgba(255, 255, 255, 0.1)',
+    transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out'
   };
 
   const handleSettingsClick = () => {
@@ -200,6 +201,7 @@ const BaseWidget = ({
         className={`widget ${isResizing ? 'resizing' : ''} ${isDragging ? 'dragging' : ''}`} 
         style={widgetStyle} 
         data-widget-id={id}
+        data-interacting={isResizing || isDragging}
       >
         <div className="widget-header">
           <div className="widget-header-left">
