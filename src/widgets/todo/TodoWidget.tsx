@@ -1,7 +1,7 @@
 import React from 'react';
 import BaseWidget from '../../components/BaseWidget';
 import TodoSettings from './components/TodoSettings';
-import { WidgetProps, WidgetSizeConfig } from '../shared/types';
+import { WidgetProps, BaseWidgetSizeConfig } from '../shared/types';
 import './styles/TodoWidget.css';
 import { useWidgetState } from '../../hooks/useWidgetState';
 
@@ -13,16 +13,24 @@ export interface TodoItem {
   text: string;
   completed: boolean;
   createdAt: Date;
+  status: 'todo' | 'in-progress' | 'done';
+  order: number;
 }
 
 export interface TodoSettings {
   displayMode?: TodoDisplayMode;
   showCompleted: boolean;
-  sortBy: 'createdAt' | 'completed';
+  sortBy: 'createdAt' | 'completed' | 'order';
+  checkboxStyle: 'square' | 'circle' | 'minimal';
+  completedStyle: {
+    strikethrough: boolean;
+    fade: boolean;
+  };
 }
 
 interface TodoWidgetState {
   todos: TodoItem[];
+  dragTarget: string | null;
 }
 
 interface TodoWidgetProps extends WidgetProps {}
@@ -32,8 +40,8 @@ interface TodoWidgetComponent extends React.FC<TodoWidgetProps> {
 }
 
 // Size configuration for Todo widget
-const todoSizeConfig: WidgetSizeConfig<TodoDisplayMode> = {
-  getSizeConfig: (width, height) => {
+const todoSizeConfig: BaseWidgetSizeConfig<TodoDisplayMode> = {
+  getSizeConfig: (width: number, height: number) => {
     if (width === 1 && height === 1) {
       return {
         category: 'tiny',
@@ -69,6 +77,16 @@ const todoSizeConfig: WidgetSizeConfig<TodoDisplayMode> = {
   defaultMode: 'list'
 };
 
+const defaultSettings: TodoSettings = {
+  showCompleted: true,
+  sortBy: 'createdAt',
+  checkboxStyle: 'square',
+  completedStyle: {
+    strikethrough: true,
+    fade: true
+  }
+};
+
 const TodoWidget: TodoWidgetComponent = ({
   id,
   style,
@@ -84,15 +102,31 @@ const TodoWidget: TodoWidgetComponent = ({
     id,
     initialGridPosition: gridPosition,
     initialGridSize: gridSize,
-    initialSettings: externalSettings || { showCompleted: true, sortBy: 'createdAt' },
-    initialData: { todos: [] }
+    initialSettings: {
+      ...defaultSettings,
+      ...(externalSettings || {})
+    },
+    initialData: { 
+      todos: [],
+      dragTarget: null 
+    }
   });
 
+  // Ensure settings are complete by merging with defaults
+  const settings = React.useMemo(() => ({
+    ...defaultSettings,
+    ...widgetState.settings,
+    completedStyle: {
+      ...defaultSettings.completedStyle,
+      ...(widgetState.settings?.completedStyle || {})
+    }
+  }), [widgetState.settings]);
+
   const [newTodoText, setNewTodoText] = React.useState('');
+  const [draggedTodo, setDraggedTodo] = React.useState<TodoItem | null>(null);
 
   // Use the todos from persistent state
   const todos = widgetState.data?.todos || [];
-  const settings = widgetState.settings!;
 
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,11 +136,16 @@ const TodoWidget: TodoWidgetComponent = ({
       id: Date.now().toString(),
       text: newTodoText.trim(),
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date(),
+      status: 'todo',
+      order: todos.length
     };
 
     updateWidgetState({
-      data: { todos: [...todos, newTodo] }
+      data: { 
+        todos: [...todos, newTodo],
+        dragTarget: widgetState.data?.dragTarget || null
+      }
     });
     setNewTodoText('');
   };
@@ -116,7 +155,8 @@ const TodoWidget: TodoWidgetComponent = ({
       data: {
         todos: todos.map(todo =>
           todo.id === id ? { ...todo, completed: !todo.completed } : todo
-        )
+        ),
+        dragTarget: widgetState.data?.dragTarget || null
       }
     });
   };
@@ -124,15 +164,24 @@ const TodoWidget: TodoWidgetComponent = ({
   const handleDeleteTodo = (id: string) => {
     updateWidgetState({
       data: {
-        todos: todos.filter(todo => todo.id !== id)
+        todos: todos.filter(todo => todo.id !== id),
+        dragTarget: widgetState.data?.dragTarget || null
       }
     });
   };
 
   const handleSettingsChange = (newSettings: TodoSettings) => {
-    updateWidgetState({ settings: newSettings });
+    const mergedSettings = {
+      ...defaultSettings,
+      ...newSettings,
+      completedStyle: {
+        ...defaultSettings.completedStyle,
+        ...(newSettings.completedStyle || {})
+      }
+    };
+    updateWidgetState({ settings: mergedSettings });
     if (onSettingsChange) {
-      onSettingsChange(newSettings);
+      onSettingsChange(mergedSettings);
     }
   };
 
@@ -142,18 +191,94 @@ const TodoWidget: TodoWidgetComponent = ({
       filtered = filtered.filter(todo => !todo.completed);
     }
     
-    // Only sort if explicitly set to 'completed', otherwise maintain creation order
-    if (settings.sortBy === 'completed') {
-      filtered.sort((a, b) => {
-        return (a.completed === b.completed) ? 0 : a.completed ? 1 : -1;
-      });
+    switch (settings.sortBy) {
+      case 'completed':
+        filtered.sort((a, b) => (a.completed === b.completed) ? 0 : a.completed ? 1 : -1);
+        break;
+      case 'order':
+        filtered.sort((a, b) => a.order - b.order);
+        break;
+      default:
+        // 'createdAt' - maintain creation order (default)
+        break;
     }
     
     return filtered;
   }, [todos, settings.showCompleted, settings.sortBy]);
 
+  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, todo: TodoItem) => {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('application/json', JSON.stringify(todo));
+    e.currentTarget.classList.add('dragging');
+    setDraggedTodo(todo);
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLLIElement>) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragging');
+    setDraggedTodo(null);
+    
+    // Remove all drag-over classes
+    document.querySelectorAll('.drag-over').forEach(el => {
+      el.classList.remove('drag-over');
+    });
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLLIElement | HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
+    
+    const target = e.currentTarget;
+    if (target && !target.classList.contains('dragging')) {
+      target.classList.add('drag-over');
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLLIElement | HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLLIElement | HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.currentTarget.classList.remove('drag-over');
+    
+    if (!draggedTodo) return;
+    
+    const dropTargetId = e.currentTarget.getAttribute('data-id');
+    if (!dropTargetId || dropTargetId === draggedTodo.id) return;
+
+    const updatedTodos = [...todos];
+    const draggedIndex = updatedTodos.findIndex(t => t.id === draggedTodo.id);
+    const dropIndex = updatedTodos.findIndex(t => t.id === dropTargetId);
+    
+    if (draggedIndex === -1 || dropIndex === -1) return;
+
+    // Remove the dragged item and insert it at the new position
+    const [draggedItem] = updatedTodos.splice(draggedIndex, 1);
+    updatedTodos.splice(dropIndex, 0, draggedItem);
+    
+    // Update order numbers
+    updatedTodos.forEach((todo, index) => {
+      todo.order = index;
+    });
+
+    // Update state with new todo order
+    updateWidgetState({
+      data: { 
+        todos: updatedTodos,
+        dragTarget: null
+      }
+    });
+    
+    setDraggedTodo(null);
+  };
+
   const renderTodoList = () => (
-    <div className="todo-list">
+    <div className="todo-list" data-checkbox-style={settings.checkboxStyle}>
       <form onSubmit={handleAddTodo} className="todo-input-form">
         <input
           type="text"
@@ -172,7 +297,22 @@ const TodoWidget: TodoWidgetComponent = ({
       </form>
       <ul className="todo-items">
         {filteredTodos.map(todo => (
-          <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+          <li
+            key={todo.id}
+            data-id={todo.id}
+            className={`todo-item ${todo.completed ? 'completed' : ''}`}
+            draggable="true"
+            onDragStart={(e) => handleDragStart(e, todo)}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            data-status={todo.status}
+            data-completed-style={[
+              todo.completed && settings.completedStyle?.strikethrough && 'strikethrough',
+              todo.completed && settings.completedStyle?.fade && 'fade'
+            ].filter(Boolean).join(' ')}
+          >
             <label className="todo-checkbox">
               <input
                 type="checkbox"
@@ -206,13 +346,28 @@ const TodoWidget: TodoWidgetComponent = ({
   );
 
   const renderCompactList = () => (
-    <div className="todo-list compact">
+    <div className="todo-list compact" data-checkbox-style={settings.checkboxStyle}>
       <div className="todo-count">
         {todos.filter(t => !t.completed).length} remaining
       </div>
       <ul className="todo-items">
         {filteredTodos.slice(0, 3).map(todo => (
-          <li key={todo.id} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+          <li
+            key={todo.id}
+            data-id={todo.id}
+            className={`todo-item ${todo.completed ? 'completed' : ''}`}
+            draggable
+            onDragStart={(e) => handleDragStart(e, todo)}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            data-status={todo.status}
+            data-completed-style={[
+              todo.completed && settings.completedStyle?.strikethrough && 'strikethrough',
+              todo.completed && settings.completedStyle?.fade && 'fade'
+            ].filter(Boolean).join(' ')}
+          >
             <label className="todo-checkbox">
               <input
                 type="checkbox"
@@ -222,6 +377,13 @@ const TodoWidget: TodoWidgetComponent = ({
               <span className="checkmark"></span>
             </label>
             <span className="todo-text">{todo.text}</span>
+            <button
+              onClick={() => handleDeleteTodo(todo.id)}
+              className="todo-delete-button"
+              title="Delete todo"
+            >
+              ×
+            </button>
           </li>
         ))}
         {filteredTodos.length === 0 && (
@@ -257,8 +419,8 @@ const TodoWidget: TodoWidgetComponent = ({
       id={id}
       title="Todo"
       style={style}
-      gridPosition={widgetState.gridPosition}
-      gridSize={widgetState.gridSize}
+      gridPosition={gridPosition}
+      gridSize={gridSize}
       onClose={onClose}
       onResize={onResize}
       onDrag={onDrag}
@@ -267,7 +429,12 @@ const TodoWidget: TodoWidgetComponent = ({
       SettingsComponent={TodoSettings}
       sizeConfig={todoSizeConfig}
     >
-      {renderContent()}
+      <div 
+        className="todo-widget-content"
+        data-checkbox-style={settings.checkboxStyle}
+      >
+        {renderContent()}
+      </div>
     </BaseWidget>
   );
 };

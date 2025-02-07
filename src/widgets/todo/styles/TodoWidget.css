@@ -261,4 +261,145 @@
 .todo-settings-select:focus {
   outline: none;
   border-color: var(--accent-color, #4a9eff);
+}
+
+/* Checkbox style variations */
+[data-checkbox-style="square"] .todo-checkbox .checkmark {
+  border-radius: 4px;
+}
+
+[data-checkbox-style="circle"] .todo-checkbox .checkmark {
+  border-radius: 50%;
+}
+
+[data-checkbox-style="minimal"] .todo-checkbox .checkmark {
+  background: transparent;
+  border-width: 1px;
+  border-radius: 4px;
+}
+
+[data-checkbox-style="minimal"] .todo-checkbox input:checked ~ .checkmark {
+  background: transparent;
+  border-color: var(--accent-color, #4a9eff);
+}
+
+[data-checkbox-style="minimal"] .todo-checkbox input:checked ~ .checkmark:after {
+  border-color: var(--accent-color, #4a9eff);
+}
+
+/* Completed item styles */
+.todo-item[data-completed-style~="strikethrough"] .todo-text {
+  text-decoration: line-through;
+}
+
+.todo-item[data-completed-style~="fade"] .todo-text {
+  opacity: 0.5;
+}
+
+.todo-item[data-completed-style~="strikethrough"][data-completed-style~="fade"] .todo-text {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* Remove default completed styles since we're using data attributes now */
+.todo-item.completed .todo-text {
+  text-decoration: none;
+  opacity: 1;
+}
+
+/* Drag and drop styles */
+.todo-item.dragging {
+  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed var(--accent-color);
+}
+
+.todo-item.drag-over {
+  position: relative;
+  transform: translateY(2px);
+}
+
+.todo-item.drag-over::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-color);
+  border-radius: 2px;
+  animation: glow 1.5s ease-in-out infinite;
+}
+
+.todo-placeholder {
+  height: 3rem;
+  margin: 0.5rem 0;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.todo-placeholder.active {
+  border-color: var(--accent-color);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Kanban styles */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  height: 100%;
+}
+
+.kanban-column {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kanban-column.drag-over {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.kanban-column-header {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kanban-column-header .status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.kanban-column[data-status="todo"] .status-indicator {
+  background: #9ca3af;
+}
+
+.kanban-column[data-status="in-progress"] .status-indicator {
+  background: #fbbf24;
+}
+
+.kanban-column[data-status="done"] .status-indicator {
+  background: #34d399;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--accent-color);
+  }
+  50% {
+    box-shadow: 0 0 10px var(--accent-color);
+  }
 } 
