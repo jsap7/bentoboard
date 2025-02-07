@@ -1,0 +1,133 @@
+import React, { useState, useEffect } from 'react';
+import BaseWidget from '../components/BaseWidget';
+
+// Clock Settings Component
+const ClockSettings = ({ settings, onSettingsChange, onClose }) => {
+  const [localSettings, setLocalSettings] = useState(settings);
+
+  const handleChange = (e) => {
+    const newSettings = {
+      ...localSettings,
+      [e.target.name]: e.target.checked
+    };
+    setLocalSettings(newSettings);
+    onSettingsChange(newSettings);
+  };
+
+  return (
+    <div className="settings-content">
+      <div className="settings-header">
+        <h2 className="settings-title">Clock Settings</h2>
+        <button className="settings-close" onClick={onClose}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div className="settings-body">
+        <label>
+          <input
+            type="checkbox"
+            name="showSeconds"
+            checked={localSettings.showSeconds}
+            onChange={handleChange}
+          />
+          Show Seconds
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="showDate"
+            checked={localSettings.showDate}
+            onChange={handleChange}
+          />
+          Show Date
+        </label>
+      </div>
+    </div>
+  );
+};
+
+const ClockWidget = ({ style, onResize }) => {
+  const [time, setTime] = useState(new Date());
+  const [settings, setSettings] = useState({
+    showSeconds: true,
+    showDate: true
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleSettingsChange = (newSettings) => {
+    setSettings(newSettings);
+  };
+
+  const contentStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    gap: '8px'
+  };
+
+  const timeStyle = {
+    fontSize: '2.5em',
+    fontWeight: 'bold',
+    letterSpacing: '0.05em'
+  };
+
+  const dateStyle = {
+    fontSize: '1.1em',
+    opacity: 0.8
+  };
+
+  const timeOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    ...(settings.showSeconds && { second: '2-digit' })
+  };
+
+  return (
+    <BaseWidget
+      id="clock"
+      title="Clock"
+      style={style}
+      settings={settings}
+      onSettingsChange={handleSettingsChange}
+      onResize={onResize}
+      SettingsComponent={ClockSettings}
+    >
+      <div style={contentStyle}>
+        <div style={timeStyle}>
+          {time.toLocaleTimeString([], timeOptions)}
+        </div>
+        {settings.showDate && (
+          <div style={dateStyle}>
+            {time.toLocaleDateString(undefined, { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </div>
+        )}
+      </div>
+    </BaseWidget>
+  );
+};
+
+// Add widget configuration
+ClockWidget.widgetConfig = {
+  defaultSize: { width: 2, height: 2 },
+  title: 'Clock',
+  description: 'Displays current time and date'
+};
+
+export default ClockWidget; 

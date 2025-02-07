@@ -1,0 +1,229 @@
+.widget {
+  background-color: var(--widget-bg-color, rgba(28, 28, 30, 0.8));
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  user-select: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.widget-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.widget-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: grab;
+  color: var(--widget-control-color, rgba(255, 255, 255, 0.6));
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+}
+
+.widget-drag-handle:active {
+  cursor: grabbing;
+}
+
+.widget-drag-handle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Show header on widget hover */
+.widget:hover .widget-header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.widget:hover .widget-drag-handle {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.widget-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--widget-title-color, rgba(255, 255, 255, 0.9));
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 0.05s;
+}
+
+.widget:hover .widget-title {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.widget-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.widget-control {
+  background: none;
+  border: none;
+  color: var(--widget-control-color, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  opacity: 0;
+  transform: translateX(10px);
+  padding: 0;
+}
+
+.widget:hover .widget-control {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Add transition delays for staggered animation */
+.widget-control:nth-child(1) { transition-delay: 0.1s; }
+.widget-control:nth-child(2) { transition-delay: 0.15s; }
+
+.widget-control svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.widget-control:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--widget-control-hover-color, rgba(255, 255, 255, 0.9));
+}
+
+.widget-control.close:hover {
+  background-color: rgba(255, 59, 48, 0.2);
+  color: #ff3b30;
+}
+
+.widget-control.settings:hover svg {
+  transform: rotate(30deg);
+}
+
+.widget-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+  position: relative;
+  margin-top: 0;
+  transition: margin-top 0.2s ease;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.widget:hover .widget-content {
+  margin-top: 44px;
+}
+
+/* Resize handle styles */
+.resize-handle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+  pointer-events: all;
+}
+
+.widget:hover .resize-handle {
+  opacity: 1;
+}
+
+.resize-handle-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--widget-control-color, rgba(255, 255, 255, 0.6));
+  border-radius: 50%;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.resize-handle:hover .resize-handle-dot {
+  transform: translate(-50%, -50%) scale(1.5);
+  background-color: var(--widget-control-hover-color, rgba(255, 255, 255, 0.9));
+}
+
+/* Position the resize handles */
+.resize-handle-se {
+  right: -10px;
+  bottom: -10px;
+  cursor: se-resize;
+}
+
+.resize-handle-sw {
+  left: -10px;
+  bottom: -10px;
+  cursor: sw-resize;
+}
+
+.resize-handle-ne {
+  right: -10px;
+  top: -10px;
+  cursor: ne-resize;
+}
+
+.resize-handle-nw {
+  left: -10px;
+  top: -10px;
+  cursor: nw-resize;
+}
+
+/* Remove the individual dot positioning since we're using transform */
+.resize-handle-se .resize-handle-dot,
+.resize-handle-sw .resize-handle-dot,
+.resize-handle-ne .resize-handle-dot,
+.resize-handle-nw .resize-handle-dot {
+  left: 50%;
+  top: 50%;
+}
+
+/* Resizing state */
+.widget.resizing {
+  transition: none !important;
+  user-select: none;
+}
+
+.widget.resizing .widget-content {
+  pointer-events: none;
+} 
