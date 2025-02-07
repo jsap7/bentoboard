@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GlobalProvider } from './context/GlobalContext';
 import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import WidgetSelector from './components/WidgetSelector';
 import { getWidget } from './registry/widgetRegistry';
+import { getAllWidgetStates } from './hooks/useWidgetState';
 
 // Import global styles (we'll create this next)
 import './styles.css';
@@ -12,6 +13,31 @@ import './styles.css';
 const App = () => {
   const [widgets, setWidgets] = useState([]);
   const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
+
+  // Load saved widgets on startup
+  useEffect(() => {
+    const savedStates = getAllWidgetStates();
+    const restoredWidgets = Object.entries(savedStates).map(([id, state]) => {
+      const [widgetType] = id.split('-');
+      const widgetConfig = getWidget(widgetType);
+      
+      if (widgetConfig) {
+        // Use the saved state's grid size and position, falling back to defaults if not present
+        return {
+          id,
+          type: widgetType,
+          component: widgetConfig.component,
+          gridPosition: state.gridPosition || { column: 0, row: 0 },
+          gridSize: state.gridSize || widgetConfig.defaultSize,
+          settings: state.settings || {},
+          data: state.data || {}
+        };
+      }
+      return null;
+    }).filter(Boolean);
+
+    setWidgets(restoredWidgets);
+  }, []);
 
   // Check if a position and size would overlap with existing widgets
   const checkCollision = (testPosition, testSize, excludeId = null) => {
@@ -33,28 +59,22 @@ const App = () => {
   };
 
   const findEmptyPosition = (widgetSize) => {
-    // Grid dimensions
     const columns = 12;
     const rows = 6;
     
-    // Try each position from top-left to bottom-right
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
-        // Check if widget would fit within grid bounds
         if (column + widgetSize.width > columns || row + widgetSize.height > rows) {
           continue;
         }
 
         const testPosition = { column, row };
-        
-        // Check for collisions at this position
         if (!checkCollision(testPosition, widgetSize)) {
           return testPosition;
         }
       }
     }
     
-    // If no empty space found, return first position
     return { column: 0, row: 0 };
   };
 
@@ -64,17 +84,14 @@ const App = () => {
       const widgetSize = widgetConfig.defaultSize || { width: 2, height: 2 };
       const position = findEmptyPosition(widgetSize);
       
-      // Double check for collisions
-      if (checkCollision(position, widgetSize)) {
-        return;
-      }
-
       const newWidget = {
         id: `${widgetType}-${Date.now()}`,
         type: widgetType,
         component: widgetConfig.component,
         gridPosition: position,
-        gridSize: widgetSize
+        gridSize: widgetSize,
+        settings: {},
+        data: {}
       };
 
       setWidgets([...widgets, newWidget]);
@@ -84,19 +101,29 @@ const App = () => {
 
   const handleRemoveWidget = (widgetId) => {
     setWidgets(widgets.filter(widget => widget.id !== widgetId));
+    localStorage.removeItem(`widget-${widgetId}`);
   };
 
   const handleWidgetResize = (widgetId, newSize) => {
     setWidgets(widgets.map(widget => {
       if (widget.id === widgetId) {
-        // Check if new size would cause collisions
-        if (checkCollision(widget.gridPosition, newSize, widgetId)) {
+        const hasCollision = checkCollision(widget.gridPosition, newSize, widgetId);
+        if (hasCollision) {
           return widget;
         }
-        return {
+        const updatedWidget = {
           ...widget,
           gridSize: newSize
         };
+        // Update localStorage immediately
+        const widgetState = {
+          gridPosition: updatedWidget.gridPosition,
+          gridSize: updatedWidget.gridSize,
+          settings: updatedWidget.settings,
+          data: updatedWidget.data
+        };
+        localStorage.setItem(`widget-${widgetId}`, JSON.stringify(widgetState));
+        return updatedWidget;
       }
       return widget;
     }));
@@ -105,14 +132,23 @@ const App = () => {
   const handleWidgetDrag = (widgetId, newPosition) => {
     setWidgets(widgets.map(widget => {
       if (widget.id === widgetId) {
-        // Check if new position would cause collisions
-        if (checkCollision(newPosition, widget.gridSize, widgetId)) {
+        const hasCollision = checkCollision(newPosition, widget.gridSize, widgetId);
+        if (hasCollision) {
           return widget;
         }
-        return {
+        const updatedWidget = {
           ...widget,
           gridPosition: newPosition
         };
+        // Update localStorage immediately
+        const widgetState = {
+          gridPosition: updatedWidget.gridPosition,
+          gridSize: updatedWidget.gridSize,
+          settings: updatedWidget.settings,
+          data: updatedWidget.data
+        };
+        localStorage.setItem(`widget-${widgetId}`, JSON.stringify(widgetState));
+        return updatedWidget;
       }
       return widget;
     }));
@@ -135,6 +171,8 @@ const App = () => {
                 onClose={() => handleRemoveWidget(widget.id)}
                 gridPosition={widget.gridPosition}
                 gridSize={widget.gridSize}
+                settings={widget.settings}
+                data={widget.data}
               />
             );
           })}

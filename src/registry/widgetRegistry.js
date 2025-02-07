@@ -1,4 +1,5 @@
-import ClockWidget from '../widgets/ClockWidget';
+import ClockWidget from '../widgets/clock/ClockWidget';
+import TodoWidget from '../widgets/todo/TodoWidget';
 
 const widgetRegistry = new Map();
 
@@ -49,4 +50,14 @@ registerWidget('clock', {
   title: 'Clock',
   description: 'Displays current time and date in various formats',
   defaultSize: { width: 2, height: 2 }
-}); 
+});
+
+// Register the todo widget
+registerWidget('todo', {
+  component: TodoWidget,
+  title: 'Todo List',
+  description: 'Keep track of tasks and todos',
+  defaultSize: { width: 2, height: 2 }
+});
+
+export default widgetRegistry; 

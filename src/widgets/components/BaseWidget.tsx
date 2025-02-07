@@ -26,21 +26,38 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
     setShowSettings(false);
   };
 
+  const gridSizeAttribute = `${gridSize.width}x${gridSize.height}`;
+  
+  console.log(`Widget ${id} grid size:`, gridSizeAttribute);
+
+  const combinedStyle = {
+    ...style,
+    gridColumn: `${gridPosition.column + 1} / span ${gridSize.width}`,
+    gridRow: `${gridPosition.row + 1} / span ${gridSize.height}`,
+    '--grid-width': gridSize.width,
+    '--grid-height': gridSize.height
+  } as React.CSSProperties;
+
   return (
     <div
       className="widget"
-      style={{
-        ...style,
-        gridColumn: `${gridPosition.x + 1} / span ${gridSize.width}`,
-        gridRow: `${gridPosition.y + 1} / span ${gridSize.height}`,
-      }}
+      data-widget-id={id}
+      data-grid-size={gridSizeAttribute}
+      style={combinedStyle}
     >
       <div className="widget-header">
-        <div className="widget-title">{title}</div>
+        <div className="widget-header-left">
+          <div className="widget-drag-handle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M8 9h8M8 15h8" />
+            </svg>
+          </div>
+          <div className="widget-title">{title}</div>
+        </div>
         <div className="widget-controls">
           {SettingsComponent && (
             <button
-              className="widget-control-button"
+              className="widget-control settings"
               onClick={handleSettingsClick}
               title="Settings"
             >
@@ -52,7 +69,7 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
           )}
           {onClose && (
             <button
-              className="widget-control-button"
+              className="widget-control close"
               onClick={onClose}
               title="Close"
             >
@@ -76,6 +93,18 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
           />
         </div>
       )}
+      <div className="resize-handle resize-handle-se">
+        <div className="resize-handle-dot" />
+      </div>
+      <div className="resize-handle resize-handle-sw">
+        <div className="resize-handle-dot" />
+      </div>
+      <div className="resize-handle resize-handle-ne">
+        <div className="resize-handle-dot" />
+      </div>
+      <div className="resize-handle resize-handle-nw">
+        <div className="resize-handle-dot" />
+      </div>
     </div>
   );
 };

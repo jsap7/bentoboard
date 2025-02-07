@@ -13,6 +13,7 @@
   will-change: transform;
   touch-action: none;
   user-select: none;
+  height: 100%;
 }
 
 .widget.dragging {
@@ -36,22 +37,36 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
   user-select: none;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
-  opacity: 1;
-  transform: none;
-  transition: background-color 0.2s ease;
   height: 44px;
   box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.widget-header:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .widget-header-left {
   display: flex;
   align-items: center;
   gap: 8px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.widget-header:hover .widget-header-left {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .widget-drag-handle {
@@ -90,13 +105,19 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--widget-title-color, rgba(255, 255, 255, 0.9));
-  opacity: 1;
-  transform: none;
 }
 
 .widget-controls {
   display: flex;
   gap: 8px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.widget-header:hover .widget-controls {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .widget-control {
@@ -111,19 +132,20 @@
   justify-content: center;
   border-radius: 6px;
   transition: all 0.2s ease;
-  opacity: 0;
-  transform: translateX(10px);
   padding: 0;
 }
 
+/* Remove the previous hover states for widget controls since they're now part of header hover */
 .widget:hover .widget-control {
   opacity: 1;
   transform: translateX(0);
 }
 
 /* Add transition delays for staggered animation */
-.widget-control:nth-child(1) { transition-delay: 0.1s; }
-.widget-control:nth-child(2) { transition-delay: 0.15s; }
+.widget-header:hover .widget-header-left { transition-delay: 0s; }
+.widget-header:hover .widget-controls { transition-delay: 0.05s; }
+.widget-header:hover .widget-control:nth-child(1) { transition-delay: 0.1s; }
+.widget-header:hover .widget-control:nth-child(2) { transition-delay: 0.15s; }
 
 .widget-control svg {
   width: 16px;
@@ -150,12 +172,16 @@
   overflow: auto;
   padding: 16px;
   position: relative;
-  margin-top: 0;
-  height: calc(100% - 44px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  box-sizing: border-box;
   border-radius: 12px;
-  overflow: hidden;
 }
 
+/* Remove the margin-top and height calc since header is now absolute */
 .widget:hover .widget-content {
   margin-top: 0;
 }

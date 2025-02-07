@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { WidgetSettingsProps } from '../../shared/types';
+import { ClockSettings as ClockSettingsType, ClockDisplayMode } from '../../shared/types';
 import '../styles/ClockWidget.css';
 
 interface ClockSettings {
   showSeconds: boolean;
   showDate: boolean;
   use24Hour: boolean;
+  displayMode?: ClockDisplayMode;
 }
 
 const ClockSettings: React.FC<WidgetSettingsProps> = ({ 
@@ -13,12 +15,21 @@ const ClockSettings: React.FC<WidgetSettingsProps> = ({
   onSettingsChange, 
   onClose 
 }) => {
-  const [localSettings, setLocalSettings] = useState<ClockSettings>(settings);
+  const [localSettings, setLocalSettings] = useState<ClockSettingsType>(settings);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSettings = {
       ...localSettings,
       [e.target.name]: e.target.checked
+    };
+    setLocalSettings(newSettings);
+    onSettingsChange(newSettings);
+  };
+
+  const handleModeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSettings = {
+      ...localSettings,
+      displayMode: e.target.value as ClockDisplayMode
     };
     setLocalSettings(newSettings);
     onSettingsChange(newSettings);
@@ -36,6 +47,27 @@ const ClockSettings: React.FC<WidgetSettingsProps> = ({
         </button>
       </div>
       <div className="clock-settings-body">
+        <div className="clock-settings-option">
+          <label htmlFor="displayMode">Display Mode</label>
+          <select
+            id="displayMode"
+            name="displayMode"
+            value={localSettings.displayMode || 'digital'}
+            onChange={handleModeChange}
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '4px',
+              color: 'inherit',
+              padding: '4px 8px',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="digital">Digital</option>
+            <option value="analog">Analog</option>
+            <option value="minimal">Minimal</option>
+          </select>
+        </div>
         <div className="clock-settings-option">
           <input
             type="checkbox"

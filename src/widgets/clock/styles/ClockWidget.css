@@ -4,54 +4,204 @@
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: 100%;
   padding: 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  text-align: center;
+  box-sizing: border-box;
 }
 
+/* Base styles for all modes */
 .clock-time {
-  font-size: 2rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  transition: all 0.2s ease;
 }
 
 .clock-date {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  transition: all 0.2s ease;
+}
+
+/* Size category styles */
+/* Tiny (1x1) */
+[data-size-category="tiny"] .clock-time {
+  font-size: 1.2rem;
+  margin-bottom: 0.2rem;
+}
+
+[data-size-category="tiny"] .clock-date {
+  font-size: 0.7rem;
+}
+
+/* Small (2x1, 1x2) */
+[data-size-category="small"] .clock-time {
+  font-size: 1.8rem;
+  margin-bottom: 0.3rem;
+}
+
+[data-size-category="small"] .clock-date {
+  font-size: 0.8rem;
+}
+
+/* Medium (2x2) */
+[data-size-category="medium"] .clock-time {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+[data-size-category="medium"] .clock-date {
   font-size: 1rem;
-  color: var(--text-secondary);
+}
+
+/* Large (3x2, 2x3) */
+[data-size-category="large"] .clock-time {
+  font-size: 3.2rem;
+  margin-bottom: 0.7rem;
+}
+
+[data-size-category="large"] .clock-date {
+  font-size: 1.2rem;
+}
+
+/* Extra Large (3x3, 4x2, 4x3, 4x4) */
+[data-size-category="xlarge"] .clock-time {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+[data-size-category="xlarge"] .clock-date {
+  font-size: 1.4rem;
+}
+
+/* Display mode specific styles */
+/* Minimal mode */
+[data-display-mode="minimal"] .clock-time {
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+[data-display-mode="minimal"] .clock-date {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+/* Digital mode - already covered by base styles */
+
+/* Analog mode */
+.clock-analog {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock-face {
+  position: relative;
+  width: 80%;
+  height: 0;
+  padding-bottom: 80%;
+  background: var(--clock-face-bg, rgba(255, 255, 255, 0.05));
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.clock-hands {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: 50% 100%;
+  background: var(--text-primary, rgba(255, 255, 255, 0.9));
+  border-radius: 4px;
+  transition: transform 0.2s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+}
+
+.hand.hour {
+  width: 4px;
+  height: 25%;
+  margin-left: -2px;
+}
+
+.hand.minute {
+  width: 3px;
+  height: 35%;
+  margin-left: -1.5px;
+  background: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.hand.second {
+  width: 1px;
+  height: 40%;
+  margin-left: -0.5px;
+  background: var(--accent-color, #6366f1);
+}
+
+/* Layout variations */
+/* Wide format (2x1) */
+[data-grid-size="2x1"] .clock-widget-content {
+  flex-direction: row;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+[data-grid-size="2x1"] .clock-date {
+  align-self: center;
 }
 
 /* Settings styles */
 .clock-settings-body {
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
 }
 
 .clock-settings-option {
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
-}
-
-.clock-settings-option input[type="checkbox"] {
-  margin-right: 0.5rem;
+  gap: 0.75rem;
 }
 
 .clock-settings-option label {
-  color: var(--text-primary);
-  font-size: 0.9rem;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: 0.95rem;
+}
+
+.clock-settings-option input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer;
+}
+
+/* Settings panel styles */
+.settings-content {
+  padding: 1.5rem;
 }
 
 .settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
 }
 
 .settings-title {
   margin: 0;
   font-size: 1.2rem;
-  color: var(--text-primary);
+  font-weight: 600;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
 }
 
 .settings-close {
@@ -59,15 +209,35 @@
   border: none;
   cursor: pointer;
   padding: 0.5rem;
-  color: var(--text-secondary);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
   transition: color 0.2s ease;
 }
 
 .settings-close:hover {
-  color: var(--text-primary);
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
 }
 
 .settings-close svg {
   width: 1.2rem;
   height: 1.2rem;
+}
+
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-body label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  cursor: pointer;
+}
+
+.settings-body input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
 } 
