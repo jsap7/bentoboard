@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { 
   BaseWidgetProps, 
   CustomCSSProperties, 
@@ -10,6 +10,7 @@ import {
 } from '../widgets/shared/types';
 import { useWidgetState } from '../hooks/useWidgetState';
 import SettingsPortal from './SettingsPortal';
+import { useGlobalContext } from '../contexts/GlobalContext';
 import './BaseWidget.css';
 
 const getDefaultSizeConfig = (width: number, height: number): BaseSizeConfig<'default'> => ({
@@ -44,6 +45,7 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
   SettingsComponent,
   sizeConfig
 }) => {
+  const { theme } = useGlobalContext();
   const [widgetState, updateWidgetState] = useWidgetState({
     id,
     initialGridPosition,
@@ -52,6 +54,8 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
   });
 
   const [showSettings, setShowSettings] = React.useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
 
   // Get size configuration based on current dimensions
   const currentSizeConfig = useMemo(() => 
@@ -112,6 +116,39 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
 
   const handleSettingsClose = () => {
     setShowSettings(false);
+  };
+
+  useEffect(() => {
+    // Update CSS variables when theme changes
+    const widget = document.documentElement;
+    widget.style.setProperty('--theme-accent-color', theme.accentColor);
+    widget.style.setProperty('--theme-accent-color-hover', theme.accentColorHover || adjustColor(theme.accentColor, -10));
+    widget.style.setProperty('--theme-background', theme.background);
+    widget.style.setProperty('--theme-surface', theme.surface);
+    widget.style.setProperty('--theme-text', theme.text);
+  }, [theme]);
+
+  const adjustColor = (color: string, amount: number): string => {
+    const clamp = (num: number): number => Math.min(255, Math.max(0, num));
+    
+    // Convert hex to RGB
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Adjust each channel
+    const adjustedR = clamp(r + amount);
+    const adjustedG = clamp(g + amount);
+    const adjustedB = clamp(b + amount);
+    
+    // Convert back to hex
+    const toHex = (n: number): string => {
+      const hex = n.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    
+    return `#${toHex(adjustedR)}${toHex(adjustedG)}${toHex(adjustedB)}`;
   };
 
   return (

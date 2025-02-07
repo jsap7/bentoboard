@@ -4,6 +4,7 @@
   height: 100%;
   gap: 1rem;
   padding: 2.75rem 1rem 1rem 1rem;
+  color: white;
 }
 
 .todo-input-form {
@@ -72,6 +73,7 @@
   border-radius: 8px;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  color: white;
 }
 
 .todo-item:hover {

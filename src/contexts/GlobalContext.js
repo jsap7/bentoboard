@@ -1,6 +1,41 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const GlobalContext = createContext();
+const GlobalContext = createContext({
+  theme: {
+    mode: 'dark',
+    accentColor: '#6366f1',
+    accentColorHover: '#4f46e5',
+    background: '#151515',
+    surface: '#2d2d2d',
+    text: '#ffffff',
+    header: '#181818',
+    font: {
+      family: 'League Spartan',
+      weights: {
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700
+      },
+      letterSpacing: '-0.01em',
+      features: {
+        stylistic: true,
+        contextual: true
+      }
+    }
+  },
+  setTheme: (theme) => {},
+  dashboardState: {
+    widgets: [],
+    layout: {
+      columns: 12,
+      rows: 6,
+      rowHeight: 160,
+      gap: 16
+    }
+  },
+  setDashboardState: (state) => {}
+});
 
 export const useGlobalContext = () => useContext(GlobalContext);
 
@@ -84,13 +119,11 @@ const defaultDashboardState = {
 };
 
 export const GlobalProvider = ({ children }) => {
-  // Initialize state from localStorage or use defaults
   const [theme, setTheme] = useState(() => {
     try {
       const savedTheme = localStorage.getItem('bentoboard-theme');
       if (savedTheme) {
         const parsed = JSON.parse(savedTheme);
-        // Ensure font settings exist
         return {
           ...defaultTheme,
           ...parsed,
@@ -116,7 +149,6 @@ export const GlobalProvider = ({ children }) => {
     }
   });
 
-  // Save theme to localStorage whenever it changes
   useEffect(() => {
     try {
       localStorage.setItem('bentoboard-theme', JSON.stringify(theme));
@@ -125,7 +157,6 @@ export const GlobalProvider = ({ children }) => {
     }
   }, [theme]);
 
-  // Save dashboard state to localStorage whenever it changes
   useEffect(() => {
     try {
       localStorage.setItem('bentoboard-dashboard', JSON.stringify(dashboardState));
@@ -134,15 +165,8 @@ export const GlobalProvider = ({ children }) => {
     }
   }, [dashboardState]);
 
-  const value = {
-    theme,
-    setTheme,
-    dashboardState,
-    setDashboardState
-  };
-
   return (
-    <GlobalContext.Provider value={value}>
+    <GlobalContext.Provider value={{ theme, setTheme, dashboardState, setDashboardState }}>
       {children}
     </GlobalContext.Provider>
   );

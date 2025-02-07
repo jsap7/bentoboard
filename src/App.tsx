@@ -1,14 +1,20 @@
 import React from 'react';
 import { WidgetStateProvider } from './contexts/WidgetStateContext';
-// ... existing imports ...
+import { GlobalProvider } from './contexts/GlobalContext';
+import Dashboard from './components/Dashboard';
+import Header from './components/Header';
+import './styles.css';
 
 function App() {
   return (
-    <WidgetStateProvider>
-      <div className="App">
-        // ... existing app content ...
-      </div>
-    </WidgetStateProvider>
+    <GlobalProvider>
+      <WidgetStateProvider>
+        <div className="App">
+          <Header />
+          <Dashboard />
+        </div>
+      </WidgetStateProvider>
+    </GlobalProvider>
   );
 }
 
