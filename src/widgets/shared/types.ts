@@ -13,15 +13,20 @@ export interface GridSize {
 // Base size configuration system
 export type SizeCategory = 'tiny' | 'small' | 'medium' | 'large' | 'xlarge';
 
-export interface SizeConfig<DisplayModeType> {
+export interface BaseSizeConfig<DisplayModeType> {
   category: SizeCategory;
   availableModes: DisplayModeType[];
   defaultMode: DisplayModeType;
-  styles?: CSSProperties;
+  styles: {
+    padding?: string;
+    fontSize?: string;
+    gap?: string;
+    [key: string]: string | undefined;
+  };
 }
 
-export interface WidgetSizeConfig<DisplayModeType> {
-  getSizeConfig: (width: number, height: number) => SizeConfig<DisplayModeType>;
+export interface BaseWidgetSizeConfig<DisplayModeType> {
+  getSizeConfig: (width: number, height: number) => BaseSizeConfig<DisplayModeType>;
   defaultMode: DisplayModeType;
 }
 
@@ -29,6 +34,10 @@ export interface WidgetSizeConfig<DisplayModeType> {
 export interface CustomCSSProperties extends CSSProperties {
   '--grid-width'?: number;
   '--grid-height'?: number;
+  '--widget-padding'?: string;
+  '--content-gap'?: string;
+  '--font-size'?: string;
+  [key: `--${string}`]: string | number | undefined;
 }
 
 export interface WidgetConfig {
@@ -40,13 +49,38 @@ export interface WidgetConfig {
   defaultSettings?: any;
 }
 
+// Add new interfaces for drag and resize events
+export interface DragEventData {
+  mouseX: number;
+  mouseY: number;
+  startPosition: GridPosition;
+  size: GridSize;
+  widgetRect: DOMRect;
+  dashboardRect: DOMRect;
+}
+
+export interface ResizeEventData {
+  mouseX: number;
+  mouseY: number;
+  startPosition: GridPosition;
+  startSize: GridSize;
+  direction: {
+    isLeft: boolean;
+    isTop: boolean;
+    isRight: boolean;
+    isBottom: boolean;
+  };
+  widgetRect: DOMRect;
+}
+
+// Update WidgetProps to include the new event types
 export interface WidgetProps {
   id: string;
   style?: CSSProperties;
   settings?: any;
   onSettingsChange?: (settings: any) => void;
-  onResize?: (size: GridSize) => void;
-  onDrag?: (position: GridPosition) => void;
+  onResize?: (data: ResizeEventData) => GridSize | null;
+  onDrag?: (data: DragEventData) => GridPosition | null;
   onClose?: () => void;
   gridPosition: GridPosition;
   gridSize: GridSize;
@@ -56,14 +90,14 @@ export interface WidgetSettingsProps {
   settings: any;
   onSettingsChange: (settings: any) => void;
   onClose: () => void;
-  availableModes?: any[];
+  availableModes?: string[];
 }
 
 export interface BaseWidgetProps extends WidgetProps {
   title: string;
   children: React.ReactNode;
   SettingsComponent?: React.ComponentType<WidgetSettingsProps>;
-  sizeConfig?: WidgetSizeConfig<any>;
+  sizeConfig?: BaseWidgetSizeConfig<any>;
 }
 
 // Clock-specific types
@@ -74,4 +108,13 @@ export interface ClockSettings {
   showDate: boolean;
   use24Hour: boolean;
   displayMode?: ClockDisplayMode;
+}
+
+export interface BaseWidgetState<T = any, S = any> {
+  id: string;
+  gridPosition: GridPosition;
+  gridSize: GridSize;
+  settings?: S;
+  data?: T;
+  displayMode?: string;
 } 

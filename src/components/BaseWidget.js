@@ -178,7 +178,12 @@ const BaseWidget = ({
     ...style,
     backgroundColor: theme.surface,
     color: theme.text,
-    cursor: isDragging ? 'grabbing' : isResizing ? 'nwse-resize' : 'default'
+    cursor: isDragging ? 'grabbing' : isResizing ? 'nwse-resize' : 'default',
+    '--accent-color': theme.accentColor,
+    '--text-primary': theme.text,
+    '--text-secondary': 'rgba(255, 255, 255, 0.6)',
+    '--surface': theme.surface,
+    '--widget-bg': 'rgba(255, 255, 255, 0.1)'
   };
 
   const handleSettingsClick = () => {

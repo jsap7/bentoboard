@@ -1,8 +1,33 @@
 import React, { useMemo } from 'react';
-import { BaseWidgetProps, CustomCSSProperties } from '../widgets/shared/types';
+import { 
+  BaseWidgetProps, 
+  CustomCSSProperties, 
+  DragEventData, 
+  ResizeEventData,
+  BaseSizeConfig,
+  GridSize,
+  GridPosition
+} from '../widgets/shared/types';
 import { useWidgetState } from '../hooks/useWidgetState';
 import SettingsPortal from './SettingsPortal';
 import './BaseWidget.css';
+
+const getDefaultSizeConfig = (width: number, height: number): BaseSizeConfig<'default'> => ({
+  category: width === 1 && height === 1 ? 'tiny' :
+           (width === 2 && height === 1) || (width === 1 && height === 2) ? 'small' :
+           width === 2 && height === 2 ? 'medium' :
+           (width === 3 && height === 2) || (width === 2 && height === 3) ? 'large' : 'xlarge',
+  availableModes: ['default'],
+  defaultMode: 'default',
+  styles: {
+    padding: width === 1 && height === 1 ? '0.5rem' :
+            (width === 2 && height === 1) || (width === 1 && height === 2) ? '0.75rem' :
+            width === 2 && height === 2 ? '1rem' :
+            (width === 3 && height === 2) || (width === 2 && height === 3) ? '1.25rem' : '1.5rem',
+    gap: '0.5rem',
+    fontSize: '1rem'
+  }
+});
 
 const BaseWidget: React.FC<BaseWidgetProps> = ({
   id,
@@ -30,27 +55,22 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
 
   // Get size configuration based on current dimensions
   const currentSizeConfig = useMemo(() => 
-    sizeConfig?.getSizeConfig(widgetState.gridSize.width, widgetState.gridSize.height),
+    sizeConfig?.getSizeConfig(widgetState.gridSize.width, widgetState.gridSize.height) ||
+    getDefaultSizeConfig(widgetState.gridSize.width, widgetState.gridSize.height),
     [sizeConfig, widgetState.gridSize.width, widgetState.gridSize.height]
   );
 
   // Calculate grid size attribute and category
   const gridSizeAttribute = `${widgetState.gridSize.width}x${widgetState.gridSize.height}`;
-  const categoryAttribute = currentSizeConfig?.category;
+  const categoryAttribute = currentSizeConfig.category;
 
   // Handle position and size changes
-  const handleResize = (newSize: typeof initialGridSize) => {
+  const handleResize = (newSize: GridSize) => {
     updateWidgetState({ gridSize: newSize });
-    if (onResize) {
-      onResize(newSize);
-    }
   };
 
-  const handleDrag = (newPosition: typeof initialGridPosition) => {
+  const handleDrag = (newPosition: GridPosition) => {
     updateWidgetState({ gridPosition: newPosition });
-    if (onDrag) {
-      onDrag(newPosition);
-    }
   };
 
   // Handle settings changes
@@ -66,14 +86,21 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
     const baseStyle: CustomCSSProperties = {
       '--grid-width': widgetState.gridSize.width,
       '--grid-height': widgetState.gridSize.height,
+      '--widget-padding': currentSizeConfig.styles.padding,
+      '--content-gap': currentSizeConfig.styles.gap,
+      '--font-size': currentSizeConfig.styles.fontSize,
       gridColumn: `${widgetState.gridPosition.column + 1} / span ${widgetState.gridSize.width}`,
       gridRow: `${widgetState.gridPosition.row + 1} / span ${widgetState.gridSize.height}`,
       ...style
     };
 
-    // Add any size-specific styles from the config
-    if (currentSizeConfig?.styles) {
-      Object.assign(baseStyle, currentSizeConfig.styles);
+    // Add any additional size-specific styles from the config
+    if (currentSizeConfig.styles) {
+      Object.entries(currentSizeConfig.styles).forEach(([key, value]) => {
+        if (!['padding', 'gap', 'fontSize'].includes(key)) {
+          baseStyle[`--${key}`] = value;
+        }
+      });
     }
 
     return baseStyle;
@@ -101,10 +128,10 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
             <div 
               className="widget-drag-handle"
               onMouseDown={(e) => {
-                const widgetElement = e.currentTarget.closest('.widget');
+                const widgetElement = e.currentTarget.closest('.widget') as HTMLElement;
                 if (!widgetElement) return;
 
-                const dashboardElement = document.querySelector('.dashboard');
+                const dashboardElement = document.querySelector('.dashboard') as HTMLElement;
                 if (!dashboardElement) return;
 
                 const widgetRect = widgetElement.getBoundingClientRect();
@@ -121,15 +148,16 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
                   const adjustedY = mouseY - offsetY;
 
                   if (onDrag) {
-                    const newPosition = onDrag({
+                    const dragData: DragEventData = {
                       mouseX: adjustedX,
                       mouseY: adjustedY,
                       startPosition: widgetState.gridPosition,
                       size: widgetState.gridSize,
                       widgetRect,
                       dashboardRect
-                    });
+                    };
 
+                    const newPosition = onDrag(dragData);
                     if (newPosition) {
                       handleDrag(newPosition);
                     }
@@ -192,7 +220,7 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
             className={`resize-handle resize-handle-${position}`}
             onMouseDown={(e) => {
               e.preventDefault();
-              const widgetElement = e.currentTarget.closest('.widget');
+              const widgetElement = e.currentTarget.closest('.widget') as HTMLElement;
               if (!widgetElement) return;
 
               const startX = e.clientX;
@@ -209,15 +237,16 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
 
               const handleMouseMove = (e: MouseEvent) => {
                 if (onResize) {
-                  const newSize = onResize({
+                  const resizeData: ResizeEventData = {
                     mouseX: e.clientX,
                     mouseY: e.clientY,
                     startPosition: widgetState.gridPosition,
                     startSize,
                     direction,
                     widgetRect
-                  });
+                  };
 
+                  const newSize = onResize(resizeData);
                   if (newSize) {
                     handleResize(newSize);
                   }
@@ -245,7 +274,7 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
             settings={widgetState.settings}
             onSettingsChange={handleSettingsChange}
             onClose={handleSettingsClose}
-            availableModes={currentSizeConfig?.availableModes}
+            availableModes={currentSizeConfig.availableModes}
           />
         </SettingsPortal>
       )}
