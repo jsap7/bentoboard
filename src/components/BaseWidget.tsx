@@ -43,7 +43,9 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
   gridPosition: initialGridPosition,
   gridSize: initialGridSize,
   SettingsComponent,
-  sizeConfig
+  sizeConfig,
+  minSize,
+  maxSize
 }) => {
   const { theme } = useGlobalContext();
   const [widgetState, updateWidgetState] = useWidgetState({
@@ -68,9 +70,27 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
   const gridSizeAttribute = `${widgetState.gridSize.width}x${widgetState.gridSize.height}`;
   const categoryAttribute = currentSizeConfig.category;
 
-  // Handle position and size changes
+  // Add a function to constrain size within min/max bounds
+  const constrainSize = useCallback((size: GridSize): GridSize => {
+    let constrainedSize = { ...size };
+
+    if (minSize) {
+      constrainedSize.width = Math.max(minSize.width, constrainedSize.width);
+      constrainedSize.height = Math.max(minSize.height, constrainedSize.height);
+    }
+
+    if (maxSize) {
+      constrainedSize.width = Math.min(maxSize.width, constrainedSize.width);
+      constrainedSize.height = Math.min(maxSize.height, constrainedSize.height);
+    }
+
+    return constrainedSize;
+  }, [minSize, maxSize]);
+
+  // Update handleResize to use the constraint function
   const handleResize = (newSize: GridSize) => {
-    updateWidgetState({ gridSize: newSize });
+    const constrainedSize = constrainSize(newSize);
+    updateWidgetState({ gridSize: constrainedSize });
   };
 
   const handleDrag = (newPosition: GridPosition) => {
@@ -280,7 +300,9 @@ const BaseWidget: React.FC<BaseWidgetProps> = ({
                     startPosition: widgetState.gridPosition,
                     startSize,
                     direction,
-                    widgetRect
+                    widgetRect,
+                    minSize,
+                    maxSize
                   };
 
                   const newSize = onResize(resizeData);

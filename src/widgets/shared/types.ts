@@ -46,6 +46,8 @@ export interface WidgetConfig {
   title: string;
   description: string;
   defaultSize: GridSize;
+  minSize?: GridSize;  // Optional minimum size constraints
+  maxSize?: GridSize;  // Optional maximum size constraints
   defaultSettings?: any;
 }
 
@@ -71,6 +73,8 @@ export interface ResizeEventData {
     isBottom: boolean;
   };
   widgetRect: DOMRect;
+  minSize?: GridSize;  // Add optional minSize constraint
+  maxSize?: GridSize;  // Add optional maxSize constraint
 }
 
 // Update WidgetProps to include the new event types
@@ -98,6 +102,8 @@ export interface BaseWidgetProps extends WidgetProps {
   children: React.ReactNode;
   SettingsComponent?: React.ComponentType<WidgetSettingsProps>;
   sizeConfig?: BaseWidgetSizeConfig<any>;
+  minSize?: GridSize;  // Minimum allowed size in grid units
+  maxSize?: GridSize;  // Maximum allowed size in grid units
 }
 
 // Clock-specific types

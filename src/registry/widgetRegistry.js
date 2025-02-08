@@ -51,7 +51,9 @@ registerWidget('clock', {
   icon: FiClock,
   title: 'Clock',
   description: 'Displays current time and date in various formats',
-  defaultSize: { width: 2, height: 2 }
+  defaultSize: { width: 2, height: 2 },
+  minSize: { width: 2, height: 1 },
+  maxSize: { width: 4, height: 4 }
 });
 
 // Register the todo widget
@@ -60,7 +62,9 @@ registerWidget('todo', {
   icon: FiCheckSquare,
   title: 'Todo List',
   description: 'Keep track of tasks and todos',
-  defaultSize: { width: 2, height: 2 }
+  defaultSize: { width: 2, height: 2 },
+  minSize: { width: 3, height: 4 },
+  maxSize: { width: 6, height: 6 }
 });
 
 export default widgetRegistry; 

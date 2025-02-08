@@ -31,7 +31,9 @@ const App = () => {
           gridPosition: state.gridPosition || { column: 0, row: 0 },
           gridSize: state.gridSize || widgetConfig.defaultSize,
           settings: state.settings || {},
-          data: state.data || {}
+          data: state.data || {},
+          minSize: widgetConfig.minSize,  // Pass through size constraints
+          maxSize: widgetConfig.maxSize
         };
       }
       return null;
@@ -92,7 +94,9 @@ const App = () => {
         gridPosition: position,
         gridSize: widgetSize,
         settings: {},
-        data: {}
+        data: {},
+        minSize: widgetConfig.minSize,
+        maxSize: widgetConfig.maxSize
       };
 
       setWidgets([...widgets, newWidget]);
@@ -173,6 +177,8 @@ const App = () => {
               gridSize={widget.gridSize}
               settings={widget.settings}
               data={widget.data}
+              minSize={widget.minSize}  // Pass through size constraints
+              maxSize={widget.maxSize}  // Pass through size constraints
             />
           );
         })}

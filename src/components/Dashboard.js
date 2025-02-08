@@ -136,7 +136,7 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     return null;
   }, [dashboardState.layout, pixelsToGrid, onWidgetDrag, hasCollisions]);
 
-  // Handle widget resize with collision detection
+  // Handle widget resize with collision detection and size constraints
   const handleWidgetResize = useCallback((widgetId, resizeData) => {
     if (!dashboardRef.current || !resizeData) return null;
 
@@ -148,7 +148,9 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
       startPosition,
       startSize,
       direction,
-      widgetRect
+      widgetRect,
+      minSize,
+      maxSize
     } = resizeData;
 
     // Ensure we have all required properties
@@ -181,6 +183,17 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     } else if (direction.isTop) {
       const diff = startPosition.row - mouseGridPos.row;
       newHeight = Math.max(1, startSize.height + diff);
+    }
+
+    // Apply min/max constraints
+    if (minSize) {
+      newWidth = Math.max(minSize.width, newWidth);
+      newHeight = Math.max(minSize.height, newHeight);
+    }
+
+    if (maxSize) {
+      newWidth = Math.min(maxSize.width, newWidth);
+      newHeight = Math.min(maxSize.height, newHeight);
     }
 
     // Ensure we don't exceed grid boundaries
@@ -269,7 +282,13 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
         {React.Children.map(children, child => {
           if (!child) return null;
           
-          const { gridPosition = { column: 0, row: 0 }, gridSize = { width: 1, height: 1 }, id } = child.props;
+          const { 
+            gridPosition = { column: 0, row: 0 }, 
+            gridSize = { width: 1, height: 1 }, 
+            id,
+            minSize,
+            maxSize
+          } = child.props;
           
           // Ensure we have valid grid position and size
           const safeGridPosition = {
@@ -294,7 +313,7 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
             style: widgetStyle,
             gridPosition: safeGridPosition,
             gridSize: safeGridSize,
-            onResize: (resizeData) => handleWidgetResize(id, resizeData),
+            onResize: (resizeData) => handleWidgetResize(id, { ...resizeData, minSize, maxSize }),
             onDrag: (dragData) => handleWidgetDrag(id, dragData)
           });
         })}
