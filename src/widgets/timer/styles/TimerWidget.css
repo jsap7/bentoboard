@@ -1,0 +1,174 @@
+.timer-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.timer-mode-selector {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.mode-button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.mode-button:hover {
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mode-button.active {
+  background: var(--accent-color);
+  color: white;
+}
+
+.timer-presets {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.preset-button {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.preset-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+}
+
+.preset-button.active {
+  background: var(--accent-color);
+  border-color: transparent;
+  color: white;
+}
+
+.timer-display {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.progress-ring {
+  width: 80%;
+  height: 80%;
+  transform: rotate(-90deg);
+  position: absolute;
+}
+
+.progress-ring-circle-bg {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.progress-ring-circle {
+  stroke: var(--accent-color);
+  transition: stroke-dasharray 0.1s ease;
+}
+
+.time-display {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.control-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent-color);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.control-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.control-button:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.control-button:active {
+  transform: scale(0.95);
+}
+
+.control-button.reset {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.control-button.reset:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+}
+
+/* Size variations */
+[data-size-category="small"] .time-display {
+  font-size: 2rem;
+}
+
+[data-size-category="small"] .control-button {
+  width: 40px;
+  height: 40px;
+}
+
+[data-size-category="small"] .control-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-size-category="large"] .time-display {
+  font-size: 3rem;
+}
+
+[data-size-category="large"] .control-button {
+  width: 56px;
+  height: 56px;
+}
+
+[data-size-category="large"] .control-button svg {
+  width: 28px;
+  height: 28px;
+} 

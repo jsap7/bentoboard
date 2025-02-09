@@ -4,6 +4,7 @@ import WeatherWidget from '../widgets/weather/WeatherWidget';
 import NotesWidget from '../widgets/notes/NotesWidget';
 import CalculatorWidget from '../widgets/calculator/CalculatorWidget';
 import { FiClock, FiCheckSquare, FiCloud, FiFileText, FiHash } from 'react-icons/fi';
+import TimerWidget from '../widgets/timer/TimerWidget';
 
 const widgetRegistry = new Map();
 
@@ -98,6 +99,17 @@ registerWidget('calculator', {
   icon: FiHash,
   title: 'Calculator',
   description: 'Basic calculator with standard operations',
+  defaultSize: { width: 2, height: 3 },
+  minSize: { width: 2, height: 3 },
+  maxSize: { width: 3, height: 4 }
+});
+
+// Register the timer widget
+registerWidget('timer', {
+  component: TimerWidget,
+  icon: FiClock,
+  title: 'Timer',
+  description: 'Countdown timer and stopwatch with presets',
   defaultSize: { width: 2, height: 3 },
   minSize: { width: 2, height: 3 },
   maxSize: { width: 3, height: 4 }
