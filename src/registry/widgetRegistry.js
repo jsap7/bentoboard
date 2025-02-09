@@ -2,7 +2,8 @@ import ClockWidget from '../widgets/clock/ClockWidget';
 import TodoWidget from '../widgets/todo/TodoWidget';
 import WeatherWidget from '../widgets/weather/WeatherWidget';
 import NotesWidget from '../widgets/notes/NotesWidget';
-import { FiClock, FiCheckSquare, FiCloud, FiFileText } from 'react-icons/fi';
+import CalculatorWidget from '../widgets/calculator/CalculatorWidget';
+import { FiClock, FiCheckSquare, FiCloud, FiFileText, FiHash } from 'react-icons/fi';
 
 const widgetRegistry = new Map();
 
@@ -89,6 +90,17 @@ registerWidget('notes', {
   defaultSize: { width: 3, height: 4 },
   minSize: { width: 2, height: 3 },
   maxSize: { width: 6, height: 6 }
+});
+
+// Register the calculator widget
+registerWidget('calculator', {
+  component: CalculatorWidget,
+  icon: FiHash,
+  title: 'Calculator',
+  description: 'Basic calculator with standard operations',
+  defaultSize: { width: 2, height: 3 },
+  minSize: { width: 2, height: 3 },
+  maxSize: { width: 3, height: 4 }
 });
 
 export default widgetRegistry; 

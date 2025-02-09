@@ -1,0 +1,118 @@
+.calculator-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--widget-bg, rgba(20, 20, 20, 0.95));
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.calculator-display {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: right;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.display-value {
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calculator-keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.key {
+  border: none;
+  border-radius: 8px;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.key:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.key:active {
+  transform: scale(0.95);
+}
+
+.key.number {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.key.function {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+}
+
+.key.operator {
+  background: var(--accent-color);
+  color: white;
+}
+
+.key.operator:hover {
+  filter: brightness(1.1);
+}
+
+.key.operator.active {
+  background: white;
+  color: var(--accent-color);
+}
+
+.key.equals {
+  background: var(--accent-color);
+  color: white;
+}
+
+.key.equals:hover {
+  filter: brightness(1.1);
+}
+
+.key.zero {
+  grid-column: span 2;
+}
+
+/* Size variations */
+[data-size-category="small"] .display-value {
+  font-size: 1.5rem;
+}
+
+[data-size-category="small"] .key {
+  font-size: 1rem;
+  padding: 0.35rem;
+}
+
+[data-size-category="large"] .display-value {
+  font-size: 2.5rem;
+}
+
+[data-size-category="large"] .key {
+  font-size: 1.5rem;
+  padding: 0.75rem;
+} 
