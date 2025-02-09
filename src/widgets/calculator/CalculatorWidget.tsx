@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import BaseWidget from '../../components/BaseWidget';
 import { WidgetProps } from '../shared/types';
+import { useWidgetState } from '../../contexts/WidgetStateContext';
 import './styles/CalculatorWidget.css';
 
 interface CalculatorWidgetProps extends WidgetProps {}
 
 interface CalculatorWidgetComponent extends React.FC<CalculatorWidgetProps> {
   widgetConfig: any;
+}
+
+interface CalculatorData {
+  display: string;
+  storedNumber: number | null;
+  operator: string | null;
+  waitingForOperand: boolean;
 }
 
 const CalculatorWidget: CalculatorWidgetComponent = ({
@@ -18,58 +26,112 @@ const CalculatorWidget: CalculatorWidgetComponent = ({
   onResize,
   onDrag
 }) => {
-  const [display, setDisplay] = useState('0');
-  const [storedNumber, setStoredNumber] = useState<number | null>(null);
-  const [operator, setOperator] = useState<string | null>(null);
-  const [waitingForOperand, setWaitingForOperand] = useState(false);
+  const [widgetState, updateWidgetState] = useWidgetState({
+    id,
+    initialGridPosition: gridPosition,
+    initialGridSize: gridSize,
+    initialData: {
+      display: '0',
+      storedNumber: null,
+      operator: null,
+      waitingForOperand: false
+    }
+  });
+
+  const calculatorData = widgetState.data as CalculatorData;
 
   const clearAll = () => {
-    setDisplay('0');
-    setStoredNumber(null);
-    setOperator(null);
-    setWaitingForOperand(false);
+    updateWidgetState({
+      data: {
+        display: '0',
+        storedNumber: null,
+        operator: null,
+        waitingForOperand: false
+      }
+    });
   };
 
   const inputDigit = (digit: string) => {
-    if (waitingForOperand) {
-      setDisplay(digit);
-      setWaitingForOperand(false);
+    if (calculatorData.waitingForOperand) {
+      updateWidgetState({
+        data: {
+          ...calculatorData,
+          display: digit,
+          waitingForOperand: false
+        }
+      });
     } else {
-      setDisplay(display === '0' ? digit : display + digit);
+      updateWidgetState({
+        data: {
+          ...calculatorData,
+          display: calculatorData.display === '0' ? digit : calculatorData.display + digit
+        }
+      });
     }
   };
 
   const inputDecimal = () => {
-    if (waitingForOperand) {
-      setDisplay('0.');
-      setWaitingForOperand(false);
-    } else if (display.indexOf('.') === -1) {
-      setDisplay(display + '.');
+    if (calculatorData.waitingForOperand) {
+      updateWidgetState({
+        data: {
+          ...calculatorData,
+          display: '0.',
+          waitingForOperand: false
+        }
+      });
+    } else if (calculatorData.display.indexOf('.') === -1) {
+      updateWidgetState({
+        data: {
+          ...calculatorData,
+          display: calculatorData.display + '.'
+        }
+      });
     }
   };
 
   const toggleSign = () => {
-    setDisplay(display.charAt(0) === '-' ? display.substr(1) : '-' + display);
+    updateWidgetState({
+      data: {
+        ...calculatorData,
+        display: calculatorData.display.charAt(0) === '-' ? calculatorData.display.substr(1) : '-' + calculatorData.display
+      }
+    });
   };
 
   const inputPercent = () => {
-    const value = parseFloat(display);
-    setDisplay(String(value / 100));
+    const value = parseFloat(calculatorData.display);
+    updateWidgetState({
+      data: {
+        ...calculatorData,
+        display: String(value / 100)
+      }
+    });
   };
 
   const performOperation = (nextOperator: string) => {
-    const value = parseFloat(display);
+    const value = parseFloat(calculatorData.display);
 
-    if (storedNumber === null) {
-      setStoredNumber(value);
-    } else if (operator) {
-      const result = calculate(storedNumber, value, operator);
-      setDisplay(String(result));
-      setStoredNumber(result);
+    if (calculatorData.storedNumber === null) {
+      updateWidgetState({
+        data: {
+          ...calculatorData,
+          storedNumber: value,
+          operator: nextOperator,
+          waitingForOperand: true
+        }
+      });
+    } else if (calculatorData.operator) {
+      const result = calculate(calculatorData.storedNumber, value, calculatorData.operator);
+      updateWidgetState({
+        data: {
+          ...calculatorData,
+          display: String(result),
+          storedNumber: result,
+          operator: nextOperator,
+          waitingForOperand: true
+        }
+      });
     }
-
-    setWaitingForOperand(true);
-    setOperator(nextOperator);
   };
 
   const calculate = (a: number, b: number, op: string): number => {
@@ -83,15 +145,20 @@ const CalculatorWidget: CalculatorWidgetComponent = ({
   };
 
   const handleEquals = () => {
-    if (storedNumber === null || operator === null) return;
+    if (calculatorData.storedNumber === null || calculatorData.operator === null) return;
 
-    const value = parseFloat(display);
-    const result = calculate(storedNumber, value, operator);
+    const value = parseFloat(calculatorData.display);
+    const result = calculate(calculatorData.storedNumber, value, calculatorData.operator);
     
-    setDisplay(String(result));
-    setStoredNumber(null);
-    setOperator(null);
-    setWaitingForOperand(true);
+    updateWidgetState({
+      data: {
+        ...calculatorData,
+        display: String(result),
+        storedNumber: null,
+        operator: null,
+        waitingForOperand: true
+      }
+    });
   };
 
   return (
@@ -107,28 +174,28 @@ const CalculatorWidget: CalculatorWidgetComponent = ({
     >
       <div className="calculator-widget">
         <div className="calculator-display">
-          <div className="display-value">{display}</div>
+          <div className="display-value">{calculatorData.display}</div>
         </div>
         <div className="calculator-keypad">
           <button className="key function" onClick={clearAll}>AC</button>
           <button className="key function" onClick={toggleSign}>±</button>
           <button className="key function" onClick={inputPercent}>%</button>
-          <button className={`key operator ${operator === '÷' ? 'active' : ''}`} onClick={() => performOperation('÷')}>÷</button>
+          <button className={`key operator ${calculatorData.operator === '÷' ? 'active' : ''}`} onClick={() => performOperation('÷')}>÷</button>
 
           <button className="key number" onClick={() => inputDigit('7')}>7</button>
           <button className="key number" onClick={() => inputDigit('8')}>8</button>
           <button className="key number" onClick={() => inputDigit('9')}>9</button>
-          <button className={`key operator ${operator === '×' ? 'active' : ''}`} onClick={() => performOperation('×')}>×</button>
+          <button className={`key operator ${calculatorData.operator === '×' ? 'active' : ''}`} onClick={() => performOperation('×')}>×</button>
 
           <button className="key number" onClick={() => inputDigit('4')}>4</button>
           <button className="key number" onClick={() => inputDigit('5')}>5</button>
           <button className="key number" onClick={() => inputDigit('6')}>6</button>
-          <button className={`key operator ${operator === '-' ? 'active' : ''}`} onClick={() => performOperation('-')}>−</button>
+          <button className={`key operator ${calculatorData.operator === '-' ? 'active' : ''}`} onClick={() => performOperation('-')}>−</button>
 
           <button className="key number" onClick={() => inputDigit('1')}>1</button>
           <button className="key number" onClick={() => inputDigit('2')}>2</button>
           <button className="key number" onClick={() => inputDigit('3')}>3</button>
-          <button className={`key operator ${operator === '+' ? 'active' : ''}`} onClick={() => performOperation('+')}>+</button>
+          <button className={`key operator ${calculatorData.operator === '+' ? 'active' : ''}`} onClick={() => performOperation('+')}>+</button>
 
           <button className="key number zero" onClick={() => inputDigit('0')}>0</button>
           <button className="key number" onClick={inputDecimal}>.</button>

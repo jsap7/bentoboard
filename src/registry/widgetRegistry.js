@@ -7,6 +7,8 @@ import { FiClock, FiCheckSquare, FiCloud, FiFileText, FiHash } from 'react-icons
 import TimerWidget from '../widgets/timer/TimerWidget';
 import HabitWidget from '../widgets/habit/HabitWidget';
 import { FiTarget } from 'react-icons/fi';
+import BookmarksWidget from '../widgets/bookmarks/BookmarksWidget';
+import { FiBookmark } from 'react-icons/fi';
 
 const widgetRegistry = new Map();
 
@@ -123,6 +125,17 @@ registerWidget('habit', {
   icon: FiTarget,
   title: 'Habit Tracker',
   description: 'Track and maintain daily and weekly habits',
+  defaultSize: { width: 2, height: 3 },
+  minSize: { width: 2, height: 2 },
+  maxSize: { width: 4, height: 6 }
+});
+
+// Register the bookmarks widget
+registerWidget('bookmarks', {
+  component: BookmarksWidget,
+  icon: FiBookmark,
+  title: 'Bookmarks',
+  description: 'Save and organize your favorite links',
   defaultSize: { width: 2, height: 3 },
   minSize: { width: 2, height: 2 },
   maxSize: { width: 4, height: 6 }
