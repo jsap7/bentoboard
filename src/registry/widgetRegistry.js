@@ -1,7 +1,8 @@
 import ClockWidget from '../widgets/clock/ClockWidget';
 import TodoWidget from '../widgets/todo/TodoWidget';
 import WeatherWidget from '../widgets/weather/WeatherWidget';
-import { FiClock, FiCheckSquare, FiCloud } from 'react-icons/fi';
+import NotesWidget from '../widgets/notes/NotesWidget';
+import { FiClock, FiCheckSquare, FiCloud, FiFileText } from 'react-icons/fi';
 
 const widgetRegistry = new Map();
 
@@ -77,6 +78,17 @@ registerWidget('weather', {
   defaultSize: { width: 2, height: 2 },
   minSize: { width: 1, height: 1 },
   maxSize: { width: 4, height: 3 }
+});
+
+// Register the notes widget
+registerWidget('notes', {
+  component: NotesWidget,
+  icon: FiFileText,
+  title: 'Notes',
+  description: 'Create and manage your notes',
+  defaultSize: { width: 3, height: 4 },
+  minSize: { width: 2, height: 3 },
+  maxSize: { width: 6, height: 6 }
 });
 
 export default widgetRegistry; 
