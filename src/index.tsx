@@ -11,16 +11,47 @@ import { getAllWidgetStates } from './hooks/useWidgetState';
 // Import global styles (we'll create this next)
 import './styles.css';
 
+interface GridPosition {
+  column: number;
+  row: number;
+}
+
+interface GridSize {
+  width: number;
+  height: number;
+}
+
+interface WidgetConfig {
+  component: React.ComponentType<any>;
+  defaultSize: GridSize;
+  minSize?: GridSize;
+  maxSize?: GridSize;
+  icon?: React.ComponentType<any>;
+  title: string;
+  description: string;
+}
+
+interface Widget {
+  id: string;
+  type: string;
+  component: React.ComponentType<any>;
+  gridPosition: GridPosition;
+  gridSize: GridSize;
+  settings: any;
+  data: any;
+  minSize?: GridSize;
+  maxSize?: GridSize;
+}
+
 const App = () => {
-  const [widgets, setWidgets] = useState([]);
-  const [isWidgetSelectorOpen, setIsWidgetSelectorOpen] = useState(false);
+  const [widgets, setWidgets] = useState<Widget[]>([]);
 
   // Load saved widgets on startup
   useEffect(() => {
     const savedStates = getAllWidgetStates();
     const restoredWidgets = Object.entries(savedStates).map(([id, state]) => {
       const [widgetType] = id.split('-');
-      const widgetConfig = getWidget(widgetType);
+      const widgetConfig = getWidget(widgetType) as WidgetConfig;
       
       if (widgetConfig) {
         // Use the saved state's grid size and position, falling back to defaults if not present
@@ -37,13 +68,13 @@ const App = () => {
         };
       }
       return null;
-    }).filter(Boolean);
+    }).filter(Boolean) as Widget[];
 
     setWidgets(restoredWidgets);
   }, []);
 
   // Check if a position and size would overlap with existing widgets
-  const checkCollision = (testPosition, testSize, excludeId = null) => {
+  const checkCollision = (testPosition: GridPosition, testSize: GridSize, excludeId: string | null = null) => {
     const left1 = testPosition.column;
     const right1 = testPosition.column + testSize.width - 1;
     const top1 = testPosition.row;
@@ -61,7 +92,7 @@ const App = () => {
     });
   };
 
-  const findEmptyPosition = (widgetSize) => {
+  const findEmptyPosition = (widgetSize: GridSize) => {
     const columns = 12;
     const rows = 6;
     
@@ -81,8 +112,8 @@ const App = () => {
     return { column: 0, row: 0 };
   };
 
-  const handleAddWidget = (widgetType) => {
-    const widgetConfig = getWidget(widgetType);
+  const handleAddWidget = (widgetType: string) => {
+    const widgetConfig = getWidget(widgetType) as WidgetConfig;
     if (widgetConfig) {
       const widgetSize = widgetConfig.defaultSize || { width: 2, height: 2 };
       const position = findEmptyPosition(widgetSize);
@@ -100,16 +131,15 @@ const App = () => {
       };
 
       setWidgets([...widgets, newWidget]);
-      setIsWidgetSelectorOpen(false);
     }
   };
 
-  const handleRemoveWidget = (widgetId) => {
+  const handleRemoveWidget = (widgetId: string) => {
     setWidgets(widgets.filter(widget => widget.id !== widgetId));
     localStorage.removeItem(`widget-${widgetId}`);
   };
 
-  const handleWidgetResize = (widgetId, newSize) => {
+  const handleWidgetResize = (widgetId: string, newSize: GridSize) => {
     setWidgets(widgets.map(widget => {
       if (widget.id === widgetId) {
         const hasCollision = checkCollision(widget.gridPosition, newSize, widgetId);
@@ -134,7 +164,7 @@ const App = () => {
     }));
   };
 
-  const handleWidgetDrag = (widgetId, newPosition) => {
+  const handleWidgetDrag = (widgetId: string, newPosition: GridPosition) => {
     setWidgets(widgets.map(widget => {
       if (widget.id === widgetId) {
         const hasCollision = checkCollision(newPosition, widget.gridSize, widgetId);
@@ -161,7 +191,7 @@ const App = () => {
 
   return (
     <div style={{ height: '100vh', overflow: 'hidden' }}>
-      <Header onAddWidget={() => setIsWidgetSelectorOpen(true)} />
+      <Header onAddWidget={handleAddWidget} />
       <Dashboard 
         onWidgetResize={handleWidgetResize}
         onWidgetDrag={handleWidgetDrag}
@@ -177,18 +207,12 @@ const App = () => {
               gridSize={widget.gridSize}
               settings={widget.settings}
               data={widget.data}
-              minSize={widget.minSize}  // Pass through size constraints
-              maxSize={widget.maxSize}  // Pass through size constraints
+              minSize={widget.minSize}
+              maxSize={widget.maxSize}
             />
           );
         })}
       </Dashboard>
-      {isWidgetSelectorOpen && (
-        <WidgetSelector
-          onSelect={handleAddWidget}
-          onClose={() => setIsWidgetSelectorOpen(false)}
-        />
-      )}
     </div>
   );
 };
