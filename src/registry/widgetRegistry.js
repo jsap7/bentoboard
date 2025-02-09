@@ -1,6 +1,7 @@
 import ClockWidget from '../widgets/clock/ClockWidget';
 import TodoWidget from '../widgets/todo/TodoWidget';
-import { FiClock, FiCheckSquare } from 'react-icons/fi';
+import WeatherWidget from '../widgets/weather/WeatherWidget';
+import { FiClock, FiCheckSquare, FiCloud } from 'react-icons/fi';
 
 const widgetRegistry = new Map();
 
@@ -65,6 +66,17 @@ registerWidget('todo', {
   defaultSize: { width: 2, height: 2 },
   minSize: { width: 3, height: 4 },
   maxSize: { width: 6, height: 6 }
+});
+
+// Register the weather widget
+registerWidget('weather', {
+  component: WeatherWidget,
+  icon: FiCloud,
+  title: 'Weather',
+  description: 'Displays current weather conditions',
+  defaultSize: { width: 2, height: 2 },
+  minSize: { width: 1, height: 1 },
+  maxSize: { width: 4, height: 3 }
 });
 
 export default widgetRegistry; 
