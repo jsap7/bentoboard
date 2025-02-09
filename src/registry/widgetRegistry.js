@@ -5,6 +5,8 @@ import NotesWidget from '../widgets/notes/NotesWidget';
 import CalculatorWidget from '../widgets/calculator/CalculatorWidget';
 import { FiClock, FiCheckSquare, FiCloud, FiFileText, FiHash } from 'react-icons/fi';
 import TimerWidget from '../widgets/timer/TimerWidget';
+import HabitWidget from '../widgets/habit/HabitWidget';
+import { FiTarget } from 'react-icons/fi';
 
 const widgetRegistry = new Map();
 
@@ -113,6 +115,17 @@ registerWidget('timer', {
   defaultSize: { width: 2, height: 3 },
   minSize: { width: 2, height: 3 },
   maxSize: { width: 3, height: 4 }
+});
+
+// Register the habit widget
+registerWidget('habit', {
+  component: HabitWidget,
+  icon: FiTarget,
+  title: 'Habit Tracker',
+  description: 'Track and maintain daily and weekly habits',
+  defaultSize: { width: 2, height: 3 },
+  minSize: { width: 2, height: 2 },
+  maxSize: { width: 4, height: 6 }
 });
 
 export default widgetRegistry; 
