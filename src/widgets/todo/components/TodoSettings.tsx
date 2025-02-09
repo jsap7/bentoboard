@@ -2,6 +2,7 @@ import React from 'react';
 import { WidgetSettingsProps } from '../../shared/types';
 import { TodoSettings as TodoSettingsType, TodoDisplayMode } from '../TodoWidget';
 import { useGlobalContext } from '../../../contexts/GlobalContext';
+import SettingsBase, { SettingsSection, SettingsRow } from '../../shared/components/SettingsBase';
 
 const TodoSettings: React.FC<WidgetSettingsProps> = ({
   settings,
@@ -50,137 +51,151 @@ const TodoSettings: React.FC<WidgetSettingsProps> = ({
   };
 
   return (
-    <>
-      <div className="settings-header">
-        <h2 className="settings-title">Todo</h2>
-        <button className="settings-close" onClick={onClose} aria-label="Close settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </div>
-      <div className="settings-content" style={{ '--accent-color': theme.accentColor } as React.CSSProperties}>
-        {availableModes.length > 0 && (
-          <div className="settings-section">
-            <h3 className="settings-section-title">Display</h3>
-            <div className="settings-option">
-              <span className="settings-option-label">View Mode</span>
-              <select
-                value={settings.displayMode || 'list'}
-                onChange={handleModeChange}
-                className="settings-select"
-              >
-                {availableModes.map(mode => (
-                  <option key={mode} value={mode}>
-                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        )}
-
-        <div className="settings-section">
-          <h3 className="settings-section-title">Appearance</h3>
-          <div className="settings-option">
-            <span className="settings-option-label">Checkbox Style</span>
+    <SettingsBase title="Todo Settings" onClose={onClose}>
+      {availableModes.length > 0 && (
+        <SettingsSection 
+          title="Display"
+          description="Choose how your todo list is displayed"
+        >
+          <SettingsRow
+            label="View Mode"
+            hint="Select the layout for your todos"
+          >
             <select
-              value={settings.checkboxStyle}
-              onChange={handleCheckboxStyleChange}
+              value={settings.displayMode || 'list'}
+              onChange={handleModeChange}
               className="settings-select"
             >
-              <option value="square">Square</option>
-              <option value="circle">Circle</option>
-              <option value="minimal">Minimal</option>
+              {availableModes.map(mode => (
+                <option key={mode} value={mode}>
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </option>
+              ))}
             </select>
-          </div>
+          </SettingsRow>
+        </SettingsSection>
+      )}
 
-          <div className="settings-option">
-            <span className="settings-option-label">Strikethrough Completed</span>
-            <label className="settings-switch">
-              <input
-                type="checkbox"
-                checked={settings.completedStyle?.strikethrough}
-                onChange={handleCompletedStyleChange}
-                name="strikethrough"
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
+      <SettingsSection 
+        title="Appearance"
+        description="Customize the visual style of your todo list"
+      >
+        <SettingsRow
+          label="Checkbox Style"
+          hint="Choose the style of the completion checkboxes"
+        >
+          <select
+            value={settings.checkboxStyle}
+            onChange={handleCheckboxStyleChange}
+            className="settings-select"
+          >
+            <option value="square">Square</option>
+            <option value="circle">Circle</option>
+            <option value="minimal">Minimal</option>
+          </select>
+        </SettingsRow>
 
-          <div className="settings-option">
-            <span className="settings-option-label">Fade Completed</span>
-            <label className="settings-switch">
-              <input
-                type="checkbox"
-                checked={settings.completedStyle?.fade}
-                onChange={handleCompletedStyleChange}
-                name="fade"
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-        </div>
+        <SettingsRow
+          label="Strikethrough Completed"
+          hint="Add a line through completed todos"
+        >
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={settings.completedStyle?.strikethrough}
+              onChange={handleCompletedStyleChange}
+              name="strikethrough"
+            />
+            <span className="toggle"></span>
+          </label>
+        </SettingsRow>
 
-        <div className="settings-section">
-          <h3 className="settings-section-title">Options</h3>
-          <div className="settings-option">
-            <span className="settings-option-label">Show Completed</span>
-            <label className="settings-switch">
-              <input
-                type="checkbox"
-                checked={settings.showCompleted}
-                onChange={handleChange}
-                name="showCompleted"
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
+        <SettingsRow
+          label="Fade Completed"
+          hint="Reduce opacity of completed todos"
+        >
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={settings.completedStyle?.fade}
+              onChange={handleCompletedStyleChange}
+              name="fade"
+            />
+            <span className="toggle"></span>
+          </label>
+        </SettingsRow>
+      </SettingsSection>
 
-          <div className="settings-option">
-            <span className="settings-option-label">Sort By</span>
-            <select
-              value={settings.sortBy}
-              onChange={handleSortChange}
-              className="settings-select"
-            >
-              <option value="createdAt">Date Created</option>
-              <option value="completed">Completion Status</option>
-              <option value="order">Custom Order</option>
-            </select>
-          </div>
-        </div>
+      <SettingsSection 
+        title="Options"
+        description="Configure todo list behavior"
+      >
+        <SettingsRow
+          label="Show Completed"
+          hint="Display completed todos in the list"
+        >
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={settings.showCompleted}
+              onChange={handleChange}
+              name="showCompleted"
+            />
+            <span className="toggle"></span>
+          </label>
+        </SettingsRow>
 
-        <div className="settings-section">
-          <h3 className="settings-section-title">Coming Soon</h3>
-          <div className="settings-option">
-            <span className="settings-option-label">Categories</span>
-            <label className="settings-switch">
-              <input
-                type="checkbox"
-                checked={false}
-                disabled
-                onChange={() => {}}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
+        <SettingsRow
+          label="Sort By"
+          hint="Choose how todos are ordered"
+        >
+          <select
+            value={settings.sortBy}
+            onChange={handleSortChange}
+            className="settings-select"
+          >
+            <option value="createdAt">Date Created</option>
+            <option value="completed">Completion Status</option>
+            <option value="order">Custom Order</option>
+          </select>
+        </SettingsRow>
+      </SettingsSection>
 
-          <div className="settings-option">
-            <span className="settings-option-label">Due Dates</span>
-            <label className="settings-switch">
-              <input
-                type="checkbox"
-                checked={false}
-                disabled
-                onChange={() => {}}
-              />
-              <span className="slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </>
+      <SettingsSection 
+        title="Coming Soon"
+        description="Features in development"
+      >
+        <SettingsRow
+          label="Categories"
+          hint="Organize todos into categories"
+        >
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={false}
+              disabled
+              onChange={() => {}}
+            />
+            <span className="toggle"></span>
+          </label>
+        </SettingsRow>
+
+        <SettingsRow
+          label="Due Dates"
+          hint="Add deadlines to your todos"
+        >
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={false}
+              disabled
+              onChange={() => {}}
+            />
+            <span className="toggle"></span>
+          </label>
+        </SettingsRow>
+      </SettingsSection>
+    </SettingsBase>
   );
 };
 
