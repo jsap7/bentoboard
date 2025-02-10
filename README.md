@@ -79,11 +79,6 @@ See our [Issues](https://github.com/jsap7/desktop-app/issues) page for a list of
 
 ## 💬 Community
 
-- [Discord Server](https://discord.gg/bentoboard)
 - [GitHub Discussions](https://github.com/jsap7/desktop-app/discussions)
-- [Twitter](https://twitter.com/bentoboard)
 
----
-
-Made with ❤️ by the BentoBoard Team
 
