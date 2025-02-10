@@ -94,22 +94,52 @@ const App = () => {
 
   const findEmptyPosition = (widgetSize: GridSize) => {
     const columns = 12;
-    const rows = 6;
     
-    for (let row = 0; row < rows; row++) {
-      for (let column = 0; column < columns; column++) {
-        if (column + widgetSize.width > columns || row + widgetSize.height > rows) {
-          continue;
+    // If there are no widgets, place at the top
+    if (widgets.length === 0) {
+      return { column: 0, row: 0 };
+    }
+    
+    // Create a map of occupied spaces
+    const occupiedSpaces = new Set();
+    widgets.forEach(widget => {
+      for (let r = widget.gridPosition.row; r < widget.gridPosition.row + widget.gridSize.height; r++) {
+        for (let c = widget.gridPosition.column; c < widget.gridPosition.column + widget.gridSize.width; c++) {
+          occupiedSpaces.add(`${r},${c}`);
         }
+      }
+    });
 
-        const testPosition = { column, row };
-        if (!checkCollision(testPosition, widgetSize)) {
-          return testPosition;
+    // Find the highest occupied row
+    let maxRow = 0;
+    widgets.forEach(widget => {
+      maxRow = Math.max(maxRow, widget.gridPosition.row + widget.gridSize.height);
+    });
+
+    // Try to find a position in the existing grid space
+    for (let row = 0; row <= maxRow; row++) {
+      for (let column = 0; column <= columns - widgetSize.width; column++) {
+        let canPlace = true;
+        
+        // Check if all required cells are free
+        for (let r = row; r < row + widgetSize.height; r++) {
+          for (let c = column; c < column + widgetSize.width; c++) {
+            if (occupiedSpaces.has(`${r},${c}`)) {
+              canPlace = false;
+              break;
+            }
+          }
+          if (!canPlace) break;
+        }
+        
+        if (canPlace) {
+          return { column, row };
         }
       }
     }
     
-    return { column: 0, row: 0 };
+    // If no space found in existing grid, place at the bottom
+    return { column: 0, row: maxRow };
   };
 
   const handleAddWidget = (widgetType: string) => {

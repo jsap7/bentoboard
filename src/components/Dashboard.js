@@ -2,31 +2,47 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useGlobalContext } from '../contexts/GlobalContext';
 import { getCellDimensions, snapToGrid } from '../utils/gridManager';
 
+const MIN_ROWS = 6;
+
 const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
   const { theme, dashboardState } = useGlobalContext();
   const dashboardRef = useRef(null);
   const [dynamicRowHeight, setDynamicRowHeight] = useState(dashboardState.layout.rowHeight);
   const [isInteracting, setIsInteracting] = useState(false);
+  const [totalRows, setTotalRows] = useState(MIN_ROWS);
+
+  // Calculate total rows needed based on widget positions
+  useEffect(() => {
+    let maxRow = MIN_ROWS;
+    React.Children.forEach(children, child => {
+      if (!child) return;
+      const { gridPosition, gridSize } = child.props;
+      const widgetBottom = gridPosition.row + gridSize.height;
+      maxRow = Math.max(maxRow, widgetBottom);
+    });
+    setTotalRows(maxRow);
+  }, [children]);
 
   const dashboardStyle = {
     position: 'relative',
     width: '100%',
-    height: `calc(100vh - 60px)`,
+    minHeight: `calc(100vh - 60px)`,
+    height: 'auto',
     backgroundColor: theme.background,
     padding: `${dashboardState.layout.gap}px`,
     boxSizing: 'border-box',
     marginTop: '60px',
-    overflow: 'hidden'
+    overflowY: 'auto',
+    overflowX: 'hidden'
   };
 
   // Calculate dynamic row height based on available space
   const calculateRowHeight = useCallback(() => {
     if (dashboardRef.current) {
-      const availableHeight = dashboardRef.current.clientHeight - (dashboardState.layout.gap * (dashboardState.layout.rows + 1));
-      const newRowHeight = Math.floor(availableHeight / dashboardState.layout.rows);
-      setDynamicRowHeight(newRowHeight);
+      const minHeight = Math.floor((window.innerHeight - 60) / totalRows);
+      setDynamicRowHeight(Math.max(minHeight, dashboardState.layout.rowHeight));
     }
-  }, [dashboardState.layout.rows, dashboardState.layout.gap]);
+  }, [totalRows, dashboardState.layout.rowHeight]);
 
   // Convert pixel coordinates to grid coordinates
   const pixelsToGrid = useCallback((x, y) => {
@@ -36,28 +52,26 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
 
     const rect = dashboardRef.current.getBoundingClientRect();
     const containerWidth = rect.width - (dashboardState.layout.gap * 2);
-    const containerHeight = rect.height - (dashboardState.layout.gap * 2);
     
     // Calculate cell dimensions including gaps
     const totalGapWidth = dashboardState.layout.gap * (dashboardState.layout.columns - 1);
-    const totalGapHeight = dashboardState.layout.gap * (dashboardState.layout.rows - 1);
-    
     const cellWidth = (containerWidth - totalGapWidth) / dashboardState.layout.columns;
-    const cellHeight = (containerHeight - totalGapHeight) / dashboardState.layout.rows;
+    const cellHeight = dynamicRowHeight + dashboardState.layout.gap;
 
     // Calculate grid position
     const column = Math.floor(x / (cellWidth + dashboardState.layout.gap));
-    const row = Math.floor(y / (cellHeight + dashboardState.layout.gap));
+    const row = Math.floor(y / cellHeight);
 
     // Ensure position is within bounds
     const boundedColumn = Math.max(0, Math.min(dashboardState.layout.columns - 1, column));
-    const boundedRow = Math.max(0, Math.min(dashboardState.layout.rows - 1, row));
+    // Allow row to exceed current totalRows to enable expansion
+    const boundedRow = Math.max(0, row);
 
     return {
       column: boundedColumn,
       row: boundedRow
     };
-  }, [dashboardState.layout]);
+  }, [dashboardState.layout, dynamicRowHeight]);
 
   // Check if two widgets overlap
   const checkCollision = useCallback((pos1, size1, pos2, size2) => {
@@ -116,15 +130,18 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
         dashboardState.layout.columns - size.width,
         gridPos.column
       )),
-      row: Math.max(0, Math.min(
-        dashboardState.layout.rows - size.height,
-        gridPos.row
-      ))
+      row: Math.max(0, gridPos.row)  // Allow vertical expansion
     };
 
     // Check for collisions
     if (hasCollisions(widgetId, newPosition, size)) {
       return null;
+    }
+
+    // Update totalRows if widget is moved below current grid
+    const newBottom = newPosition.row + size.height;
+    if (newBottom > totalRows) {
+      setTotalRows(newBottom);
     }
 
     // Call the parent's onWidgetDrag callback
@@ -134,13 +151,11 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     }
 
     return null;
-  }, [dashboardState.layout, pixelsToGrid, onWidgetDrag, hasCollisions]);
+  }, [dashboardState.layout, pixelsToGrid, onWidgetDrag, hasCollisions, totalRows]);
 
   // Handle widget resize with collision detection and size constraints
   const handleWidgetResize = useCallback((widgetId, resizeData) => {
     if (!dashboardRef.current || !resizeData) return null;
-
-    setIsInteracting(true);  // Show grid when resizing starts
 
     const {
       mouseX,
@@ -153,58 +168,64 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
       maxSize
     } = resizeData;
 
-    // Ensure we have all required properties
-    if (!startPosition || !startSize || !direction) {
-      return null;
-    }
+    setIsInteracting(true);  // Show grid when resizing starts
 
-    const rect = dashboardRef.current.getBoundingClientRect();
+    // Convert mouse position to grid coordinates
+    const mouseGridPos = pixelsToGrid(mouseX, mouseY);
     
-    // Calculate relative mouse position in the dashboard
-    const relativeX = mouseX - rect.left - dashboardState.layout.gap;
-    const relativeY = mouseY - rect.top - dashboardState.layout.gap;
-
-    // Convert to grid coordinates
-    const mouseGridPos = pixelsToGrid(relativeX, relativeY);
-    
-    // Calculate new size based on resize direction
     let newWidth = startSize.width;
     let newHeight = startSize.height;
+    let newPosition = { ...startPosition };
 
-    if (direction.isRight) {
-      newWidth = Math.max(1, mouseGridPos.column - startPosition.column + 1);
-    } else if (direction.isLeft) {
-      const diff = startPosition.column - mouseGridPos.column;
-      newWidth = Math.max(1, startSize.width + diff);
+    // Handle horizontal resize
+    if (direction.isLeft) {
+      const widthDiff = startPosition.column - mouseGridPos.column;
+      newWidth = startSize.width + widthDiff;
+      newPosition.column = startPosition.column - widthDiff;
+    } else if (direction.isRight) {
+      newWidth = mouseGridPos.column - startPosition.column + 1;
     }
 
-    if (direction.isBottom) {
-      newHeight = Math.max(1, mouseGridPos.row - startPosition.row + 1);
-    } else if (direction.isTop) {
-      const diff = startPosition.row - mouseGridPos.row;
-      newHeight = Math.max(1, startSize.height + diff);
+    // Handle vertical resize
+    if (direction.isTop) {
+      const heightDiff = startPosition.row - mouseGridPos.row;
+      newHeight = startSize.height + heightDiff;
+      newPosition.row = startPosition.row - heightDiff;
+    } else if (direction.isBottom) {
+      newHeight = mouseGridPos.row - startPosition.row + 1;
     }
 
-    // Apply min/max constraints
+    // Apply size constraints
     if (minSize) {
-      newWidth = Math.max(minSize.width, newWidth);
-      newHeight = Math.max(minSize.height, newHeight);
+      newWidth = Math.max(newWidth, minSize.width);
+      newHeight = Math.max(newHeight, minSize.height);
     }
-
     if (maxSize) {
-      newWidth = Math.min(maxSize.width, newWidth);
-      newHeight = Math.min(maxSize.height, newHeight);
+      newWidth = Math.min(newWidth, maxSize.width);
+      newHeight = Math.min(newHeight, maxSize.height);
     }
 
-    // Ensure we don't exceed grid boundaries
-    const newSize = {
-      width: Math.min(newWidth, dashboardState.layout.columns - startPosition.column),
-      height: Math.min(newHeight, dashboardState.layout.rows - startPosition.row)
-    };
+    // Ensure we don't exceed grid boundaries for width
+    newWidth = Math.max(1, Math.min(newWidth, dashboardState.layout.columns - newPosition.column));
+    
+    // Ensure minimum height of 1
+    newHeight = Math.max(1, newHeight);
 
-    // Check for collisions with new size
-    if (hasCollisions(widgetId, startPosition, newSize)) {
+    // Ensure position is valid
+    newPosition.column = Math.max(0, Math.min(newPosition.column, dashboardState.layout.columns - 1));
+    newPosition.row = Math.max(0, newPosition.row);
+
+    const newSize = { width: newWidth, height: newHeight };
+
+    // Check for collisions with new size and position
+    if (hasCollisions(widgetId, newPosition, newSize)) {
       return null;
+    }
+
+    // Update totalRows if widget extends below current grid
+    const newBottom = newPosition.row + newHeight;
+    if (newBottom > totalRows) {
+      setTotalRows(newBottom);
     }
 
     // Call the parent's onWidgetResize callback
@@ -213,7 +234,7 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     }
 
     return newSize;
-  }, [dashboardState.layout, pixelsToGrid, onWidgetResize, hasCollisions]);
+  }, [dashboardState.layout, pixelsToGrid, onWidgetResize, hasCollisions, totalRows]);
 
   useEffect(() => {
     calculateRowHeight();
@@ -238,15 +259,16 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
     bottom: dashboardState.layout.gap,
     display: 'grid',
     gridTemplateColumns: `repeat(${dashboardState.layout.columns}, 1fr)`,
-    gridTemplateRows: `repeat(${dashboardState.layout.rows}, ${dynamicRowHeight}px)`,
+    gridTemplateRows: `repeat(${totalRows}, ${dynamicRowHeight}px)`,
     gap: `${dashboardState.layout.gap}px`,
+    minHeight: `${totalRows * (dynamicRowHeight + dashboardState.layout.gap)}px`
   };
 
   const createGridCells = () => {
     const cells = [];
-    const { columns, rows } = dashboardState.layout;
+    const { columns } = dashboardState.layout;
     
-    for (let row = 0; row < rows; row++) {
+    for (let row = 0; row < totalRows; row++) {
       for (let col = 0; col < columns; col++) {
         cells.push(
           <div
@@ -290,15 +312,14 @@ const Dashboard = ({ children, onWidgetResize, onWidgetDrag }) => {
             maxSize
           } = child.props;
           
-          // Ensure we have valid grid position and size
           const safeGridPosition = {
             column: Math.max(0, Math.min(gridPosition.column || 0, dashboardState.layout.columns - 1)),
-            row: Math.max(0, Math.min(gridPosition.row || 0, dashboardState.layout.rows - 1))
+            row: Math.max(0, gridPosition.row || 0)
           };
 
           const safeGridSize = {
             width: Math.max(1, Math.min(gridSize.width || 1, dashboardState.layout.columns - safeGridPosition.column)),
-            height: Math.max(1, Math.min(gridSize.height || 1, dashboardState.layout.rows - safeGridPosition.row))
+            height: Math.max(1, gridSize.height || 1)
           };
 
           const widgetStyle = {
