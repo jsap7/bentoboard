@@ -71,7 +71,7 @@ Please note that this project is released with a [Code of Conduct](CODE_OF_CONDU
 
 ## 📜 License
 
-BentoBoard is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+BentoBoard is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE.md) file for details.
 
 ## 🐛 Known Issues
 
