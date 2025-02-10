@@ -45,33 +45,47 @@ interface Widget {
 
 const App = () => {
   const [widgets, setWidgets] = useState<Widget[]>([]);
+  const [activeWidgetIds, setActiveWidgetIds] = useState<string[]>(() => {
+    // Load active widget IDs from localStorage
+    const saved = localStorage.getItem('bentoboard-active-widgets');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  // Load saved widgets on startup
+  // Load only active widgets on startup
   useEffect(() => {
     const savedStates = getAllWidgetStates();
-    const restoredWidgets = Object.entries(savedStates).map(([id, state]) => {
-      const [widgetType] = id.split('-');
-      const widgetConfig = getWidget(widgetType) as WidgetConfig;
-      
-      if (widgetConfig) {
-        // Use the saved state's grid size and position, falling back to defaults if not present
-        return {
-          id,
-          type: widgetType,
-          component: widgetConfig.component,
-          gridPosition: state.gridPosition || { column: 0, row: 0 },
-          gridSize: state.gridSize || widgetConfig.defaultSize,
-          settings: state.settings || {},
-          data: state.data || {},
-          minSize: widgetConfig.minSize,  // Pass through size constraints
-          maxSize: widgetConfig.maxSize
-        };
-      }
-      return null;
-    }).filter(Boolean) as Widget[];
+    const restoredWidgets = activeWidgetIds
+      .map(id => {
+        const state = savedStates[id];
+        if (!state) return null;
+        
+        const [widgetType] = id.split('-');
+        const widgetConfig = getWidget(widgetType) as WidgetConfig;
+        
+        if (widgetConfig) {
+          return {
+            id,
+            type: widgetType,
+            component: widgetConfig.component,
+            gridPosition: state.gridPosition || { column: 0, row: 0 },
+            gridSize: state.gridSize || widgetConfig.defaultSize,
+            settings: state.settings || {},
+            data: state.data || {},
+            minSize: widgetConfig.minSize,
+            maxSize: widgetConfig.maxSize
+          };
+        }
+        return null;
+      })
+      .filter(Boolean) as Widget[];
 
     setWidgets(restoredWidgets);
-  }, []);
+  }, [activeWidgetIds]);
+
+  // Save active widget IDs whenever they change
+  useEffect(() => {
+    localStorage.setItem('bentoboard-active-widgets', JSON.stringify(activeWidgetIds));
+  }, [activeWidgetIds]);
 
   // Check if a position and size would overlap with existing widgets
   const checkCollision = (testPosition: GridPosition, testSize: GridSize, excludeId: string | null = null) => {
@@ -148,8 +162,9 @@ const App = () => {
       const widgetSize = widgetConfig.defaultSize || { width: 2, height: 2 };
       const position = findEmptyPosition(widgetSize);
       
+      const newWidgetId = `${widgetType}-${Date.now()}`;
       const newWidget = {
-        id: `${widgetType}-${Date.now()}`,
+        id: newWidgetId,
         type: widgetType,
         component: widgetConfig.component,
         gridPosition: position,
@@ -160,12 +175,14 @@ const App = () => {
         maxSize: widgetConfig.maxSize
       };
 
-      setWidgets([...widgets, newWidget]);
+      setWidgets(prev => [...prev, newWidget]);
+      setActiveWidgetIds(prev => [...prev, newWidgetId]);
     }
   };
 
   const handleRemoveWidget = (widgetId: string) => {
     setWidgets(widgets.filter(widget => widget.id !== widgetId));
+    setActiveWidgetIds(prev => prev.filter(id => id !== widgetId));
     localStorage.removeItem(`widget-${widgetId}`);
   };
 
