@@ -96,7 +96,7 @@ src/
 * Limit the first line to 72 characters or less
 * Reference issues and pull requests liberally after the first line
 
-### Testing
+### Testing (Not necessary, i didnt write any tests lol)
 
 * Write tests for new features
 * Update tests when modifying existing functionality
@@ -108,16 +108,8 @@ src/
 ## Documentation
 
 * Update the README.md with details of changes to the interface
-* Update the API documentation for any modified endpoints
-* Add JSDoc comments for new functions and classes
 * Update the widget development guide if adding new widget capabilities
 
 ## Community
 
-* Join our [Discord server](https://discord.gg/bentoboard)
 * Participate in [GitHub Discussions](https://github.com/jsap7/desktop-app/discussions)
-* Follow us on [Twitter](https://twitter.com/bentoboard)
-
-## Questions?
-
-Feel free to open an issue or join our Discord server if you have any questions about contributing! 
